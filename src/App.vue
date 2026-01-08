@@ -8,12 +8,8 @@ import WeatherTips from './components/WeatherTips.vue'
 
 const API_ENDPOINT = 'https://api.weatherapi.com/v1'
 const city = ref()
-const displayCityName = ref('Москва')
+const displayCityName = ref()
 const data = ref()
-
-function setDisplayCityName() {
-  displayCityName.value = city.value
-}
 
 async function getWeather() {
   const params = new URLSearchParams({
@@ -24,9 +20,6 @@ async function getWeather() {
   })
   const res = await fetch(`${API_ENDPOINT}/forecast.json?${params.toString()}`)
   data.value = await res.json()
-  console.log(data)
-
-  setDisplayCityName()
 }
 
 const temp = computed(() => {
