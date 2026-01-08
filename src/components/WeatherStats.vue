@@ -6,7 +6,7 @@ const { label, stat } = defineProps({ label: String, stat: Number })
     <div class="stat-card">
       <div class="info">
         <div class="label">{{ label }}</div>
-        <div class="value">{{ stat }}%</div>
+        <div class="value">{{ stat }}</div>
       </div>
     </div>
   </div>

@@ -1,29 +1,72 @@
 <script setup>
+import { computed, ref } from 'vue'
 import WeatherStats from './components/WeatherStats.vue'
 import CityName from './components/CityName.vue'
 import WeatherDisplay from './components/WeatherDisplay.vue'
 import CityInput from './components/CityInput.vue'
 import WeatherTips from './components/WeatherTips.vue'
 
-const data = {
-  label: 'Влажность',
-  stat: 90,
+const API_ENDPOINT = 'https://api.weatherapi.com/v1'
+const city = ref()
+const displayCityName = ref('Москва')
+const data = ref()
+
+function setDisplayCityName() {
+  displayCityName.value = city.value
 }
 
-function getCity(city) {
-  console.log(city)
+async function getWeather() {
+  const params = new URLSearchParams({
+    q: city.value,
+    lang: 'ru',
+    key: 'cd3200bf0f914528862150404260801',
+    day: 3,
+  })
+  const res = await fetch(`${API_ENDPOINT}/forecast.json?${params.toString()}`)
+  data.value = await res.json()
+  console.log(data)
+
+  setDisplayCityName()
 }
+
+const temp = computed(() => {
+  if (!data.value) {
+    return {}
+  }
+  return {
+    temp: data.value.current.temp_c,
+    desc: data.value.current.condition.text,
+  }
+})
+const weather = computed(() => {
+  if (!data.value) {
+    return []
+  }
+  return [
+    {
+      label: 'Влажность',
+      stat: data.value.current.humidity,
+    },
+    {
+      label: 'Ветер',
+      stat: data.value.current.wind_mph,
+    },
+    {
+      label: 'Облачность',
+      stat: data.value.current.cloud,
+    },
+  ]
+})
 </script>
 
 <template>
   <div class="app">
-    <CityName></CityName>
-    <WeatherDisplay></WeatherDisplay>
+    <CityName :name="displayCityName"></CityName>
+    <WeatherDisplay :temp="temp.temp" :desc="temp.desc"></WeatherDisplay>
     <div class="stat-container">
-      <WeatherStats v-bind="data"></WeatherStats>
-      <WeatherStats v-bind="data"></WeatherStats>
+      <WeatherStats v-for="item in weather" v-bind="item" :key="item.label"></WeatherStats>
     </div>
-    <CityInput @input-city="getCity"></CityInput>
+    <CityInput @keyup.enter="getWeather" @inputCity="getWeather" v-model="city"></CityInput>
     <WeatherTips></WeatherTips>
   </div>
 </template>

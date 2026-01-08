@@ -1,19 +1,16 @@
 <script setup>
-const emits = defineEmits({
-  inputCity(payload) {
-    return payload ? true : false
-  },
-})
+const name = defineModel()
+const emit = defineEmits(['inputCity'])
 
-function log() {
-  emits('inputCity', 'Moscow')
+function setCity() {
+  emit('inputCity')
 }
 </script>
 
 <template>
   <div class="city-input">
-    <input type="text" placeholder="Введите город" />
-    <button @click="log()">Поиск</button>
+    <input v-model="name" type="text" placeholder="Введите город" />
+    <button @click="setCity">Поиск</button>
   </div>
 </template>
 

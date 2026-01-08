@@ -1,6 +1,8 @@
-<script setup></script>
+<script setup>
+const props = defineProps({ name: String })
+</script>
 <template>
-  <div class="city-name">Москва</div>
+  <div class="city-name">{{ props.name }}</div>
 </template>
 <style scoped>
 .city-name {

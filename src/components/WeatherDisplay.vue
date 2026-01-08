@@ -1,13 +1,10 @@
 <script setup>
-import { ref } from 'vue'
-
-const temperature = ref(12)
-const description = ref('Очень теплая и солнечная погода')
+const { temp, desc } = defineProps({ temp: Number, desc: String })
 </script>
 <template>
   <div class="weather-card">
-    <div class="temperature">{{ temperature }}°C</div>
-    <div class="description">{{ description }}</div>
+    <div class="temperature">{{ temp }}°C</div>
+    <div class="description">{{ desc }}</div>
   </div>
 </template>
 <style scoped>
