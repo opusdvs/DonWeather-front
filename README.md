@@ -1,4 +1,3 @@
-````md
 # DonWeather‑front
 
 Фронтенд погодного приложения **DonWeather** на Vue 3 + Vite.
@@ -29,7 +28,6 @@
 git clone https://github.com/opusdvs/DonWeather-front.git
 cd DonWeather-front
 ```
-````
 
 2. Установите зависимости:
 
