@@ -1,45 +1,164 @@
-# DonWeather-front
+````md
+# DonWeather‑front
 
-This template should help get you started developing with Vue 3 in Vite.
+Фронтенд погодного приложения **DonWeather** на Vue 3 + Vite.
 
-## Recommended IDE Setup
+Приложение позволяет:
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- Смотреть текущую погоду в выбранном городе
+- Просматривать основные показатели: температура, влажность, ветер, давление
+- Получать рекомендации на день
+- Вводить любой город для запроса погоды
 
-## Recommended Browser Setup
+---
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+## 📦 Стек
 
-## Customize configuration
+- **Vue 3** + `<script setup>`
+- **Vite** — сборщик проекта
+- **Axios** — для запросов к API погоды
+- **JavaScript, HTML, CSS**
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+---
 
-## Project Setup
+## 🛠 Установка и запуск
 
-```sh
+1. Клонируйте репозиторий:
+
+```bash
+git clone https://github.com/opusdvs/DonWeather-front.git
+cd DonWeather-front
+```
+````
+
+2. Установите зависимости:
+
+```bash
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+3. Запустите проект в режиме разработки:
 
-```sh
+```bash
 npm run dev
 ```
 
-### Compile and Minify for Production
+Приложение будет доступно на `http://localhost:3000`.
 
-```sh
-npm run build
+---
+
+## ⚙️ Настройка API
+
+В проекте используются переменные:
+
+- `API_ENDPOINT` — базовый URL API
+- `API_ROUTES.register` — маршрут для запроса погоды
+
+Создайте файл `.env` в корне проекта и задайте свои значения:
+
+```env
+VITE_API_ENDPOINT=https://example.com
+VITE_API_ROUTE_REGISTER=weather
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+---
 
-```sh
-npm run lint
+## 🧩 Структура компонентов
+
+### 1. CityName
+
+Отображает название города с градиентным текстом и hover-эффектом.
+
+```vue
+<CityName :name="displayCityName" />
 ```
-# DonWeather-front
+
+---
+
+### 2. WeatherDisplay
+
+Показывает текущую температуру и описание погоды.
+
+```vue
+<WeatherDisplay :temp="temp.temp" :desc="temp.desc" />
+```
+
+---
+
+### 3. WeatherStats
+
+Отображает статистику: влажность, ветер, давление.
+
+```vue
+<WeatherStats v-for="item in weather" v-bind="item" :key="item.label" />
+```
+
+---
+
+### 4. CityInput
+
+Поле ввода города с кнопкой поиска и событием Enter.
+
+```vue
+<CityInput v-model="city" @keyup.enter="getWeather" @inputCity="getWeather" />
+```
+
+---
+
+### 5. WeatherTips
+
+Рекомендации на день.
+
+```vue
+<WeatherTips />
+```
+
+---
+
+## 🔄 Логика работы
+
+- При монтировании (`onMounted`) вызывается функция `getWeather()`
+- `getWeather` делает POST-запрос через Axios к API
+- Данные о погоде сохраняются в `data`
+- `computed` свойства `temp` и `weather` формируют данные для компонентов
+- `displayCityName` хранит текущее название города
+
+Пример `computed` свойства `temp`:
+
+```js
+const temp = computed(() => {
+  if (!data.value) return {}
+  return {
+    temp: data.value.current.temp_c,
+    desc: data.value.current.condition.text,
+  }
+})
+```
+
+---
+
+## 🎨 Стилизация
+
+- Современный UI с тенями, градиентами и hover-анимациями
+- Компоненты адаптивны и центрированы
+- Flexbox для горизонтального и вертикального выравнивания
+- Используется `scoped` CSS для каждого компонента
+
+---
+
+## 💡 Вклад
+
+1. Форкнуть репозиторий
+2. Создать ветку `feature/имя-фичи`
+3. Сделать изменения
+4. Открыть Pull Request
+
+---
+
+## 📄 Лицензия
+
+Проект под лицензией `MIT`.
+
+```
+
+```
