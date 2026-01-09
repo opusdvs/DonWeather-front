@@ -1,10 +1,15 @@
 <script setup>
 import { computed, ref, onMounted } from 'vue'
+import axios from 'axios'
 import WeatherStats from './components/WeatherStats.vue'
 import CityName from './components/CityName.vue'
 import WeatherDisplay from './components/WeatherDisplay.vue'
 import CityInput from './components/CityInput.vue'
 import WeatherTips from './components/WeatherTips.vue'
+
+const API_ROUTES = {
+  register: 'weather/register',
+}
 
 const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT
 const city = ref('Москва')
@@ -20,17 +25,17 @@ function setDisplayCityName(city = 'Москва') {
 }
 
 async function getWeather() {
-  const params = new URLSearchParams({
+  const reqJson = {
     q: city.value,
     lang: 'ru',
-    key: import.meta.env.VITE_API_KEY,
-    day: 3,
-  })
-  const res = await fetch(`${API_ENDPOINT}/forecast.json?${params.toString()}`)
-  data.value = await res.json()
-
-  if (res.status == 200) {
+    day: '3',
+  }
+  try {
+    const res = await axios.post(`${API_ENDPOINT}/${API_ROUTES.register}`, reqJson)
+    data.value = res.data
     setDisplayCityName(city.value)
+  } catch (err) {
+    console.error('Ошибка запроса:', err)
   }
 }
 
@@ -54,11 +59,11 @@ const weather = computed(() => {
     },
     {
       label: 'Ветер',
-      stat: data.value.current.wind_mph,
+      stat: data.value.current.wind_kph,
     },
     {
-      label: 'Облачность',
-      stat: data.value.current.cloud,
+      label: 'Давление',
+      stat: data.value.current.pressure_mb,
     },
   ]
 })
