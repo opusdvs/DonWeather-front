@@ -6,7 +6,7 @@ import WeatherDisplay from './components/WeatherDisplay.vue'
 import CityInput from './components/CityInput.vue'
 import WeatherTips from './components/WeatherTips.vue'
 
-const API_ENDPOINT = 'https://api.weatherapi.com/v1'
+const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT
 const city = ref('Москва')
 const displayCityName = ref()
 const data = ref()
@@ -23,7 +23,7 @@ async function getWeather() {
   const params = new URLSearchParams({
     q: city.value,
     lang: 'ru',
-    key: 'cd3200bf0f914528862150404260801',
+    key: import.meta.env.VITE_API_KEY,
     day: 3,
   })
   const res = await fetch(`${API_ENDPOINT}/forecast.json?${params.toString()}`)
