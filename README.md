@@ -103,7 +103,7 @@ const temp = computed(() => {
 
 ## 📄 Лицензия
 
-Проект под лицензией `MIT`.
+Проект под лицензией `Boost Software License 1.0`.
 
 ```
 
