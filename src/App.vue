@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import WeatherStats from './components/WeatherStats.vue'
 import CityName from './components/CityName.vue'
 import WeatherDisplay from './components/WeatherDisplay.vue'
@@ -7,9 +7,17 @@ import CityInput from './components/CityInput.vue'
 import WeatherTips from './components/WeatherTips.vue'
 
 const API_ENDPOINT = 'https://api.weatherapi.com/v1'
-const city = ref()
+const city = ref('Москва')
 const displayCityName = ref()
 const data = ref()
+
+onMounted(() => {
+  getWeather()
+})
+
+function setDisplayCityName(city = 'Москва') {
+  displayCityName.value = city
+}
 
 async function getWeather() {
   const params = new URLSearchParams({
@@ -20,6 +28,10 @@ async function getWeather() {
   })
   const res = await fetch(`${API_ENDPOINT}/forecast.json?${params.toString()}`)
   data.value = await res.json()
+
+  if (res.status == 200) {
+    setDisplayCityName(city.value)
+  }
 }
 
 const temp = computed(() => {
