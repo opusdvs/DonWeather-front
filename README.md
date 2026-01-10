@@ -61,28 +61,6 @@ VITE_API_ROUTE_REGISTER=weather
 
 ---
 
-## 🔄 Логика работы
-
-- При монтировании (`onMounted`) вызывается функция `getWeather()`
-- `getWeather` делает POST-запрос через Axios к API
-- Данные о погоде сохраняются в `data`
-- `computed` свойства `temp` и `weather` формируют данные для компонентов
-- `displayCityName` хранит текущее название города
-
-Пример `computed` свойства `temp`:
-
-```js
-const temp = computed(() => {
-  if (!data.value) return {}
-  return {
-    temp: data.value.current.temp_c,
-    desc: data.value.current.condition.text,
-  }
-})
-```
-
----
-
 ## 🎨 Стилизация
 
 - Современный UI с тенями, градиентами и hover-анимациями
