@@ -7,6 +7,8 @@ import WeatherDisplay from './components/WeatherDisplay.vue'
 import CityInput from './components/CityInput.vue'
 import WeatherTips from './components/WeatherTips.vue'
 import WeatherForecast from './components/WeatherForecast.vue'
+import DeveloperContacts from './components/DeveloperContacts.vue'
+import CopyrightFooter from './components/CopyrightFooter.vue'
 
 const API_ROUTES = {
   register: 'weather/register',
@@ -72,28 +74,59 @@ const weather = computed(() => {
 
 <template>
   <div class="app">
-    <CityName :name="displayCityName"></CityName>
-    <WeatherDisplay :temp="temp.temp" :desc="temp.desc"></WeatherDisplay>
-    <div class="stat-container">
-      <WeatherStats v-for="item in weather" v-bind="item" :key="item.label"></WeatherStats>
+    <div class="main-content">
+      <CityName :name="displayCityName"></CityName>
+      <WeatherDisplay :temp="temp.temp" :desc="temp.desc"></WeatherDisplay>
+      <div class="stat-container">
+        <WeatherStats v-for="item in weather" v-bind="item" :key="item.label"></WeatherStats>
+      </div>
+      <div class="forecast-section">
+        <h2 class="forecast-title">Прогноз погоды на 3 дня</h2>
+        <div class="forecast-container">
+          <WeatherForecast></WeatherForecast>
+        </div>
+      </div>
+      <CityInput @keyup.enter="getWeather" @inputCity="getWeather" v-model="city"></CityInput>
+      <WeatherTips></WeatherTips>
+      <CopyrightFooter></CopyrightFooter>
     </div>
-    <div class="forecast-container">
-      <WeatherForecast></WeatherForecast>
-    </div>
-    <CityInput @keyup.enter="getWeather" @inputCity="getWeather" v-model="city"></CityInput>
-    <WeatherTips></WeatherTips>
+    <aside class="sidebar">
+      <DeveloperContacts></DeveloperContacts>
+    </aside>
   </div>
 </template>
 
 <style scoped>
 .app {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  flex-direction: row;
   min-height: 100vh;
   padding: var(--spacing-lg);
   gap: var(--spacing-lg);
+  align-items: flex-start;
+  justify-content: center;
+  position: relative;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  flex: 0 1 auto;
+  max-width: 1200px;
+  gap: var(--spacing-lg);
+  margin: 0 auto;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  right: var(--spacing-lg);
+  top: var(--spacing-lg);
+  min-width: 280px;
+  z-index: 10;
 }
 
 .stat-container {
@@ -105,6 +138,23 @@ const weather = computed(() => {
   flex-wrap: wrap;
 }
 
+.forecast-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+}
+
+.forecast-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-primary);
+  text-align: center;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
 .forecast-container {
   display: flex;
   flex-direction: row;
@@ -112,5 +162,24 @@ const weather = computed(() => {
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
+}
+
+@media (max-width: 1024px) {
+  .app {
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .main-content {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .sidebar {
+    position: static;
+    width: 100%;
+    min-width: auto;
+    align-items: center;
+  }
 }
 </style>
