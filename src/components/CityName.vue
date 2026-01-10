@@ -7,45 +7,37 @@ const props = defineProps({ name: String })
 <style scoped>
 .city-name {
   font-size: 32px;
-  font-weight: 800;
+  font-weight: 700;
   text-align: center;
-  margin: 20px 0;
-  letter-spacing: 1.5px;
+  margin: var(--spacing-lg) 0;
+  letter-spacing: 1px;
   position: relative;
   cursor: default;
-  transition:
-    transform 0.3s ease,
-    filter 0.3s ease;
-  will-change: transform, filter;
-
-  /* Градиентный текст (WebKit) */
-  background: linear-gradient(90deg, #1e3a8a, #3b82f6);
+  transition: transform 0.3s ease, filter 0.3s ease;
+  background: var(--gradient-text);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-
-  /* Фолбэк для других браузеров */
-  color: #1e3a8a; /* если градиент не поддерживается */
+  background-clip: text;
+  color: var(--color-accent);
 }
 
-/* Подчеркивающая линия */
 .city-name::after {
   content: '';
   display: block;
   width: 50px;
-  height: 3px;
-  background: #3b82f6;
-  margin: 10px auto 0;
-  border-radius: 2px;
+  height: 2px;
+  background: var(--gradient);
+  margin: var(--spacing-sm) auto 0;
+  border-radius: var(--radius-sm);
   transition: width 0.3s ease;
 }
 
-/* Hover эффекты */
 .city-name:hover {
-  transform: translateY(-4px);
-  filter: drop-shadow(0 4px 10px rgba(59, 130, 246, 0.4));
+  transform: translateY(-2px);
+  filter: drop-shadow(0 4px 12px rgba(144, 217, 224, 0.3));
 }
 
 .city-name:hover::after {
-  width: 80px;
+  width: 70px;
 }
 </style>

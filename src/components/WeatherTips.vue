@@ -10,33 +10,34 @@ const tipsText = ref('Можно гулять')
 </template>
 <style scoped>
 .weather-tips {
-  background: #f0f8ff;
-  border-radius: 16px;
-  padding: 20px;
-  width: 280px;
+  background: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  width: 320px;
+  max-width: 100%;
   text-align: center;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
-  margin-top: 20px;
+  box-shadow: var(--shadow-md);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
 
 .weather-tips:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  background: var(--color-bg-hover);
 }
 
 .weather-tips h3 {
   font-size: 18px;
-  color: #1e40af;
-  margin-bottom: 12px;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-bottom: var(--spacing-md);
 }
 
 .weather-tips p {
   font-size: 15px;
-  color: #333;
-  line-height: 1.5;
+  color: var(--color-primary-dark);
+  line-height: 1.6;
   margin: 0;
+  font-weight: 400;
 }
 </style>

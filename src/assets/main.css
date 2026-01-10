@@ -1,27 +1,40 @@
 :root {
   --color-primary: #e5e7eb;
-  --color-bg: #343d4b;
-  --color-primary-inverted: #000000;
+  --color-primary-dark: #9ca3af;
+  --color-bg: #222831;
   --color-bg-card: #272e37;
-  --color-bg-main: #222831;
-  --gradient: linear-gradient(91deg, rgba(144, 217, 224, 0.9) 0.2%, rgba(84, 96, 230, 0.9) 100%);
+  --color-bg-hover: #2e3540;
+  --color-accent: #90d9e0;
+  --color-accent-secondary: #5460e6;
   --gradient: linear-gradient(256deg, rgba(144, 217, 224, 0.9) 9.04%, rgba(84, 96, 230, 0.9) 100%);
+  --gradient-text: linear-gradient(90deg, #90d9e0 0%, #5460e6 100%);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.25);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
   --font: 'Montserrat', sans-serif;
+  --spacing-xs: 8px;
+  --spacing-sm: 12px;
+  --spacing-md: 16px;
+  --spacing-lg: 20px;
+  --spacing-xl: 24px;
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: Inter, system-ui, sans-serif;
 }
 
 body {
   min-height: 100vh;
-  background: linear-gradient(180deg, #0f172a, #020617);
-  font-family: 'Montserrat', sans-serif;
+  background: linear-gradient(180deg, var(--color-bg) 0%, #1a1f26 100%);
+  font-family: var(--font);
   color: var(--color-primary);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
-  background-color: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }

@@ -18,36 +18,54 @@ function setCity() {
 .city-input {
   display: flex;
   justify-content: center;
-  gap: 10px;
-  margin: 20px 0;
+  gap: var(--spacing-sm);
+  margin: var(--spacing-lg) 0;
 }
 
 .city-input input {
-  padding: 10px 15px;
+  padding: var(--spacing-sm) var(--spacing-md);
   font-size: 16px;
-  border: 2px solid #1e40af;
-  border-radius: 8px;
+  font-family: var(--font);
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-bg-hover);
+  border-radius: var(--radius-sm);
   outline: none;
-  width: 200px;
-  transition: border-color 0.2s ease;
+  width: 240px;
+  color: var(--color-primary);
+  transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.city-input input::placeholder {
+  color: var(--color-primary-dark);
 }
 
 .city-input input:focus {
-  border-color: #3b82f6;
+  border-color: var(--color-accent);
+  background: var(--color-bg-hover);
+  box-shadow: 0 0 0 3px rgba(144, 217, 224, 0.1);
 }
 
 .city-input button {
-  padding: 10px 20px;
+  padding: var(--spacing-sm) var(--spacing-lg);
   font-size: 16px;
-  background-color: #1e40af;
-  color: #fff;
+  font-family: var(--font);
+  font-weight: 500;
+  background: var(--gradient);
+  color: var(--color-bg);
   border: none;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+  box-shadow: var(--shadow-sm);
 }
 
 .city-input button:hover {
-  background-color: #3b82f6;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  opacity: 0.95;
+}
+
+.city-input button:active {
+  transform: translateY(0);
 }
 </style>

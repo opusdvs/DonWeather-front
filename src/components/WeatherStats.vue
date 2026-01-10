@@ -15,39 +15,48 @@ const { label, stat } = defineProps({ label: String, stat: Number })
 <style scoped>
 .weather-stats {
   display: flex;
-  gap: 20px;
+  gap: var(--spacing-lg);
   justify-content: center;
-  margin-top: 20px;
 }
 
 .stat-card {
-  background: #f0f4f8;
-  border-radius: 12px;
-  padding: 15px 20px;
+  background: var(--color-bg-card);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md) var(--spacing-lg);
   display: flex;
   align-items: center;
-  gap: 15px;
-  min-width: 120px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease;
+  gap: var(--spacing-md);
+  min-width: 130px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
 }
 
 .stat-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+  background: var(--color-bg-hover);
 }
 
 .icon {
   font-size: 24px;
+  color: var(--color-accent);
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
 }
 
 .info .label {
-  font-size: 14px;
-  color: #555;
+  font-size: 13px;
+  color: var(--color-primary-dark);
+  font-weight: 400;
+  margin-bottom: var(--spacing-xs);
 }
 
 .info .value {
-  font-size: 18px;
-  font-weight: bold;
-  color: #222;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--color-primary);
 }
 </style>
