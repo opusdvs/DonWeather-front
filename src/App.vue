@@ -9,24 +9,30 @@ import WeatherTips from './components/WeatherTips.vue'
 import WeatherForecast from './components/WeatherForecast.vue'
 import DeveloperContacts from './components/DeveloperContacts.vue'
 import CopyrightFooter from './components/CopyrightFooter.vue'
-
+import ErrorDisplay from './components/ErrorDisplay.vue'
 
 const API_ROUTES = {
   register: 'weather/register',
 }
 const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT
+const errorStatus = ref(false)
 const city = ref(localStorage.getItem('city') || 'Москва')
 const displayCityName = ref()
 const data = ref()
 
 watch(city, (newCity) => {
-  localStorage.setItem('city', newCity)
+  if (!errorStatus.value) {
+    localStorage.setItem('city', newCity)
+  }
 })
 
 onMounted(() => {
   getWeather()
 })
 
+function closeError(value) {
+  errorStatus.value = value
+}
 function setDisplayCityName(city = 'Москва') {
   displayCityName.value = city
 }
@@ -40,8 +46,10 @@ async function getWeather() {
   try {
     const res = await axios.post(`${API_ENDPOINT}/${API_ROUTES.register}`, reqJson)
     data.value = res.data
+    errorStatus.value = false
     setDisplayCityName(data.value.location.name)
   } catch (err) {
+    errorStatus.value = true
     console.error('Ошибка запроса:', err)
   }
 }
@@ -81,11 +89,11 @@ const forecast = computed(() => {
   }
   return data.value.forecast.forecastday
 })
-
 </script>
 
 <template>
   <div class="app">
+    <ErrorDisplay v-show="errorStatus" @closeError="closeError"></ErrorDisplay>
     <div class="main-content">
       <CityName :name="displayCityName"></CityName>
       <WeatherDisplay :temp="temp.temp" :desc="temp.desc"></WeatherDisplay>

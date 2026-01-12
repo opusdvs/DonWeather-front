@@ -17,7 +17,10 @@ const tipsText = ref('Можно гулять')
   max-width: 100%;
   text-align: center;
   box-shadow: var(--shadow-md);
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease,
+    background 0.3s ease;
 }
 
 .weather-tips:hover {
