@@ -1,27 +1,14 @@
-<script setup></script>
+<script setup>
+  const { date, maxtemp_c, text } = defineProps({ date: String, maxtemp_c: Number, text: String })
+  const formattedDate = new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
+</script>
 <template>
   <div class="weather-forecast">
     <div class="forecast-card">
       <div class="info">
-        <div class="label">Сегодня</div>
-        <div class="value">+18°</div>
-        <div class="desc">Ясно</div>
-      </div>
-    </div>
-
-    <div class="forecast-card">
-      <div class="info">
-        <div class="label">Завтра</div>
-        <div class="value">+16°</div>
-        <div class="desc">Облачно</div>
-      </div>
-    </div>
-
-    <div class="forecast-card">
-      <div class="info">
-        <div class="label">Послезавтра</div>
-        <div class="value">+14°</div>
-        <div class="desc">Дождь</div>
+        <div class="label">{{ formattedDate }}</div>
+        <div class="value">{{ maxtemp_c}}</div>
+        <div class="desc">{{ text }}</div>
       </div>
     </div>
   </div>

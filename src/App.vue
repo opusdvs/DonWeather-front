@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
 import axios from 'axios'
 import WeatherStats from './components/WeatherStats.vue'
 import CityName from './components/CityName.vue'
@@ -10,14 +10,18 @@ import WeatherForecast from './components/WeatherForecast.vue'
 import DeveloperContacts from './components/DeveloperContacts.vue'
 import CopyrightFooter from './components/CopyrightFooter.vue'
 
+
 const API_ROUTES = {
   register: 'weather/register',
 }
-
 const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT
-const city = ref('Москва')
+const city = ref(localStorage.getItem('city') || 'Москва')
 const displayCityName = ref()
 const data = ref()
+
+watch(city, (newCity) => {
+  localStorage.setItem('city', newCity)
+})
 
 onMounted(() => {
   getWeather()
@@ -31,12 +35,12 @@ async function getWeather() {
   const reqJson = {
     q: city.value,
     lang: 'ru',
-    day: '3',
+    days: '3',
   }
   try {
     const res = await axios.post(`${API_ENDPOINT}/${API_ROUTES.register}`, reqJson)
     data.value = res.data
-    setDisplayCityName(city.value)
+    setDisplayCityName(data.value.location.name)
   } catch (err) {
     console.error('Ошибка запроса:', err)
   }
@@ -70,6 +74,14 @@ const weather = computed(() => {
     },
   ]
 })
+
+const forecast = computed(() => {
+  if (!data.value) {
+    return []
+  }
+  return data.value.forecast.forecastday
+})
+
 </script>
 
 <template>
@@ -83,7 +95,13 @@ const weather = computed(() => {
       <div class="forecast-section">
         <h2 class="forecast-title">Прогноз погоды на 3 дня</h2>
         <div class="forecast-container">
-          <WeatherForecast></WeatherForecast>
+          <WeatherForecast
+            v-for="item in forecast"
+            :key="item.date"
+            :date="item.date"
+            :maxtemp_c="item.day.maxtemp_c"
+            :text="item.day.condition.text"
+          />
         </div>
       </div>
       <CityInput @keyup.enter="getWeather" @inputCity="getWeather" v-model="city"></CityInput>
