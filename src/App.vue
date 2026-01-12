@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, onMounted, watch } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import axios from 'axios'
 import WeatherStats from './components/WeatherStats.vue'
 import CityName from './components/CityName.vue'
@@ -20,12 +20,6 @@ const city = ref(localStorage.getItem('city') || 'Москва')
 const displayCityName = ref()
 const data = ref()
 
-watch(city, (newCity) => {
-  if (!errorStatus.value) {
-    localStorage.setItem('city', newCity)
-  }
-})
-
 onMounted(() => {
   getWeather()
 })
@@ -45,8 +39,9 @@ async function getWeather() {
   }
   try {
     const res = await axios.post(`${API_ENDPOINT}/${API_ROUTES.register}`, reqJson)
-    data.value = res.data
     errorStatus.value = false
+    data.value = res.data
+    localStorage.setItem('city', data.value.location.name)
     setDisplayCityName(data.value.location.name)
   } catch (err) {
     errorStatus.value = true
@@ -93,8 +88,8 @@ const forecast = computed(() => {
 
 <template>
   <div class="app">
-    <ErrorDisplay v-show="errorStatus" @closeError="closeError"></ErrorDisplay>
     <div class="main-content">
+      <ErrorDisplay :show="errorStatus" @closeError="closeError" />
       <CityName :name="displayCityName"></CityName>
       <WeatherDisplay :temp="temp.temp" :desc="temp.desc"></WeatherDisplay>
       <div class="stat-container">
