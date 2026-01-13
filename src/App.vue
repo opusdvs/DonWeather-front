@@ -60,35 +60,13 @@ async function getWeather(value) {
   } catch (err) {
     errorStatus.value = true
 
-    if (axios.isAxiosError(err)) {
-      if (err.response) {
-        const status = err.response.status
-        if (status === 404) {
-          errorCode.value = "Не найдено"
-          errorMessage.value = "Город не найден. Проверьте название и попробуйте снова."
-        } else if (status === 400) {
-          errorCode.value = "Ошибка запроса"
-          errorMessage.value = "Неверный запрос. Проверьте название города."
-        } else if (status >= 500) {
-          errorCode.value = "Ошибка сервера"
-          errorMessage.value = "Сервер временно недоступен. Попробуйте позже."
-        } else {
-          errorCode.value = "Ошибка"
-          errorMessage.value = err.response.data?.message || "Произошла ошибка при запросе данных."
-        }
-      } else if (err.request) {
-        // Запрос отправлен, но ответа нет (сеть, таймаут)
-        errorCode.value = "Ошибка сети"
-        errorMessage.value = "Нет соединения с сервером. Проверьте интернет-соединение."
-      } else {
-        // Ошибка при настройке запроса
-        errorCode.value = "Ошибка"
-        errorMessage.value = "Не удалось выполнить запрос. Попробуйте снова."
-      }
+    // Проверяем тип ошибки и обрабатываем соответственно
+    if (err.response?.status === 404) {
+      errorCode.value = "Не найдено"
+      errorMessage.value = "Город не найден. Проверьте название и попробуйте снова."
     } else {
-      // Другая ошибка
       errorCode.value = "Ошибка"
-      errorMessage.value = "Произошла непредвиденная ошибка. Попробуйте снова."
+      errorMessage.value = "Неверное название города"
     }
 
   } finally {
