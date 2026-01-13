@@ -1,15 +1,21 @@
 <script setup>
-const name = defineModel()
+import { ref } from 'vue';
+const city = ref("")
 const emit = defineEmits(['inputCity'])
 
 function setCity() {
-  emit('inputCity')
+  emit('inputCity', city.value)
+  city.value = ""
+}
+
+function cityValidation(value) {
+  city.value = value.target.value.replace(/\d/g, '')
 }
 </script>
 
 <template>
   <div class="city-input">
-    <input v-model="name" type="text" placeholder="Введите город" />
+    <input @input="cityValidation" @keyup.enter="setCity" v-model="city" type="text" placeholder="Введите город" />
     <button @click="setCity">Поиск</button>
   </div>
 </template>

@@ -21,7 +21,7 @@ const displayCityName = ref()
 const data = ref()
 
 onMounted(() => {
-  getWeather()
+  getWeather(city.value)
 })
 
 function closeError(value) {
@@ -31,7 +31,8 @@ function setDisplayCityName(city = 'Москва') {
   displayCityName.value = city
 }
 
-async function getWeather() {
+async function getWeather(value) {
+  city.value = value
   const reqJson = {
     q: city.value,
     lang: 'ru',
@@ -107,7 +108,7 @@ const forecast = computed(() => {
           />
         </div>
       </div>
-      <CityInput @keyup.enter="getWeather" @inputCity="getWeather" v-model="city"></CityInput>
+      <CityInput @inputCity="getWeather"></CityInput>
       <WeatherTips></WeatherTips>
       <CopyrightFooter></CopyrightFooter>
     </div>

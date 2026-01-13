@@ -1,3 +1,11 @@
+<script setup>
+defineProps({
+  show: Boolean,
+  code: { type: [String, Number], default: 'Ошибка' },
+  message: { type: String, default: 'Попробуйте снова.' },
+})
+</script>
+
 <template>
   <transition name="slide-fade">
     <div v-if="show" class="error-toast">
@@ -9,14 +17,6 @@
     </div>
   </transition>
 </template>
-
-<script setup>
-defineProps({
-  show: Boolean,
-  code: { type: [String, Number], default: 'Ошибка' },
-  message: { type: String, default: 'Попробуйте снова.' },
-})
-</script>
 
 <style scoped>
 /* Toast в левом верхнем углу */
