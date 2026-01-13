@@ -7,7 +7,7 @@
     <div class="forecast-card">
       <div class="info">
         <div class="label">{{ formattedDate }}</div>
-        <div class="value">{{ maxtemp_c}}</div>
+        <div class="value">{{ maxtemp_c }}°C</div>
         <div class="desc">{{ text }}</div>
       </div>
     </div>
@@ -31,7 +31,7 @@
   min-width: 110px;
   box-shadow: var(--shadow-sm);
   transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
-  cursor: default;
+  cursor: pointer;
 }
 
 .forecast-card:hover {

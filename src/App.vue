@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref, onMounted, watch } from 'vue'
 import axios from 'axios'
 import WeatherStats from './components/WeatherStats.vue'
 import CityName from './components/CityName.vue'
@@ -10,7 +10,7 @@ import WeatherForecast from './components/WeatherForecast.vue'
 import DeveloperContacts from './components/DeveloperContacts.vue'
 import CopyrightFooter from './components/CopyrightFooter.vue'
 import ErrorDisplay from './components/ErrorDisplay.vue'
-
+import LoadingSpinner from './components/LoadingSpinner.vue'
 const API_ROUTES = {
   register: 'weather/register',
 }
@@ -21,6 +21,8 @@ const displayCityName = ref()
 const data = ref()
 const errorCode = ref("")
 const errorMessage = ref("")
+const loading = ref(false)
+const loadingMessage = ref("Загрузка данных...")
 
 onMounted(() => {
   getWeather(city.value)
@@ -41,6 +43,7 @@ async function getWeather(value) {
     errorMessage.value = "Введите город"
     return
   }
+  loading.value = true
   const reqJson = {
     q: city.value,
     lang: 'ru',
@@ -50,48 +53,102 @@ async function getWeather(value) {
     const res = await axios.post(`${API_ENDPOINT}/${API_ROUTES.register}`, reqJson)
     errorStatus.value = false
     data.value = res.data
-    localStorage.setItem('city', data.value.location.name)
-    setDisplayCityName(data.value.location.name)
+    if (data.value?.location?.name) {
+      localStorage.setItem('city', data.value.location.name)
+      setDisplayCityName(data.value.location.name)
+    }
   } catch (err) {
     errorStatus.value = true
-    console.error('Ошибка запроса:', err)
+
+    if (axios.isAxiosError(err)) {
+      if (err.response) {
+        const status = err.response.status
+        if (status === 404) {
+          errorCode.value = "Не найдено"
+          errorMessage.value = "Город не найден. Проверьте название и попробуйте снова."
+        } else if (status === 400) {
+          errorCode.value = "Ошибка запроса"
+          errorMessage.value = "Неверный запрос. Проверьте название города."
+        } else if (status >= 500) {
+          errorCode.value = "Ошибка сервера"
+          errorMessage.value = "Сервер временно недоступен. Попробуйте позже."
+        } else {
+          errorCode.value = "Ошибка"
+          errorMessage.value = err.response.data?.message || "Произошла ошибка при запросе данных."
+        }
+      } else if (err.request) {
+        // Запрос отправлен, но ответа нет (сеть, таймаут)
+        errorCode.value = "Ошибка сети"
+        errorMessage.value = "Нет соединения с сервером. Проверьте интернет-соединение."
+      } else {
+        // Ошибка при настройке запроса
+        errorCode.value = "Ошибка"
+        errorMessage.value = "Не удалось выполнить запрос. Попробуйте снова."
+      }
+    } else {
+      // Другая ошибка
+      errorCode.value = "Ошибка"
+      errorMessage.value = "Произошла непредвиденная ошибка. Попробуйте снова."
+    }
+
+  } finally {
+    loading.value = false
   }
 }
 
 const temp = computed(() => {
-  if (!data.value) {
+  if (!data.value?.current) {
     return {}
   }
   return {
-    temp: data.value.current.temp_c,
-    desc: data.value.current.condition.text,
+    temp: data.value.current?.temp_c ?? null,
+    desc: data.value.current?.condition?.text ?? 'Нет данных',
   }
 })
 const weather = computed(() => {
-  if (!data.value) {
+  if (!data.value?.current) {
     return []
   }
   return [
     {
       label: 'Влажность',
-      stat: data.value.current.humidity,
+      stat: data.value.current?.humidity ?? 0,
     },
     {
       label: 'Ветер',
-      stat: data.value.current.wind_kph,
+      stat: data.value.current?.wind_kph ?? 0,
     },
     {
       label: 'Давление',
-      stat: data.value.current.pressure_mb,
+      stat: data.value.current?.pressure_mb ?? 0,
     },
   ]
 })
 
 const forecast = computed(() => {
-  if (!data.value) {
+  if (!data.value?.forecast?.forecastday) {
+    return []
+  }
+  if (data.value.forecast.forecastday.length === 0) {
     return []
   }
   return data.value.forecast.forecastday
+})
+
+let errorTimer = null
+
+watch(errorStatus, (newVal) => {
+  if (errorTimer) {
+    clearTimeout(errorTimer)
+    errorTimer = null
+  }
+
+  if (newVal) {
+    errorTimer = setTimeout(() => {
+      errorStatus.value = false
+      errorTimer = null
+    }, 5000)
+  }
 })
 </script>
 
@@ -109,11 +166,14 @@ const forecast = computed(() => {
         <div class="forecast-container">
           <WeatherForecast
             v-for="item in forecast"
-            :key="item.date"
-            :date="item.date"
-            :maxtemp_c="item.day.maxtemp_c"
-            :text="item.day.condition.text"
+            :key="item?.date"
+            :date="item?.date"
+            :maxtemp_c="item?.day?.maxtemp_c"
+            :text="item?.day?.condition?.text"
           />
+          <div v-if="loading" class="loading-overlay">
+            <LoadingSpinner size="medium" :message="loadingMessage" />
+          </div>
         </div>
       </div>
       <CityInput @inputCity="getWeather"></CityInput>
@@ -192,6 +252,17 @@ const forecast = computed(() => {
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
+  position: relative;
+  min-height: 120px;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  pointer-events: none;
 }
 
 @media (max-width: 1024px) {
