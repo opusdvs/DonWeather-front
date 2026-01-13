@@ -19,6 +19,8 @@ const errorStatus = ref(false)
 const city = ref(localStorage.getItem('city') || 'Москва')
 const displayCityName = ref()
 const data = ref()
+const errorCode = ref("")
+const errorMessage = ref("")
 
 onMounted(() => {
   getWeather(city.value)
@@ -33,6 +35,12 @@ function setDisplayCityName(city = 'Москва') {
 
 async function getWeather(value) {
   city.value = value
+  if (city.value === "") {
+    errorStatus.value = true
+    errorCode.value = "Информация"
+    errorMessage.value = "Введите город"
+    return
+  }
   const reqJson = {
     q: city.value,
     lang: 'ru',
@@ -90,7 +98,7 @@ const forecast = computed(() => {
 <template>
   <div class="app">
     <div class="main-content">
-      <ErrorDisplay :show="errorStatus" @closeError="closeError" />
+      <ErrorDisplay :show="errorStatus" :code="errorCode" :message="errorMessage"  @closeError="closeError" />
       <CityName :name="displayCityName"></CityName>
       <WeatherDisplay :temp="temp.temp" :desc="temp.desc"></WeatherDisplay>
       <div class="stat-container">
