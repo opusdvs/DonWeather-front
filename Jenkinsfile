@@ -158,8 +158,10 @@ spec:
     }
     
     post {
-        always {
-            cleanWs()
-        }
+            success {
+                script {
+                    currentBuild.description = "Docker Image: ${env.DOCKER_IMAGE_HASH}"
+                }
+            }
     }
 }
