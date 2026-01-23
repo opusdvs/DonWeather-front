@@ -70,7 +70,7 @@ describe('App', () => {
 
     axios.post.mockResolvedValue(mockData)
 
-    const wrapper = mount(App, {
+    mount(App, {
       global: {
         stubs: {
           WeatherStats: true,
