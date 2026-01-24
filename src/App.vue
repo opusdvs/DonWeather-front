@@ -11,7 +11,7 @@ import DeveloperContacts from './components/DeveloperContacts.vue'
 import CopyrightFooter from './components/CopyrightFooter.vue'
 import ErrorDisplay from './components/ErrorDisplay.vue'
 import LoadingSpinner from './components/LoadingSpinner.vue'
-import { ENV } from '/env.js'
+import { ENV } from '../public/env.js'
 const API_ROUTES = {
   register: 'weather/register',
 }
