@@ -158,7 +158,7 @@ VITE_API_ENDPOINT=http://localhost:8000
 
 ### Kubernetes (Helm) + Vault (ExternalSecret): `VITE_API_ENDPOINT`
 
-Для деплоя в Kubernetes используется Helm chart в папке [`.helm/`](./.helm).
+Для деплоя в Kubernetes используется Helm chart в папке [`.helm/donweather-front/`](./.helm/donweather-front).
 
 #### 1) Создать секрет в Vault (KV)
 
@@ -203,7 +203,7 @@ externalSecret:
 #### 3) Установить/обновить релиз
 
 ```bash
-helm upgrade --install donweather-front ./.helm -n donweather --create-namespace
+helm upgrade --install donweather-front ./.helm/donweather-front -n donweather --create-namespace
 ```
 
 ## 🎨 Дизайн и стилистика

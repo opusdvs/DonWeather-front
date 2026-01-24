@@ -1,19 +1,19 @@
 ## DonWeather Front Helm Chart
 
-Chart лежит в `.helm/` (как в `DonWeather-ms-weather`): `Chart.yaml`, `values.yaml`, `templates/*`.
+Chart лежит в `.helm/donweather-front/`: `Chart.yaml`, `values.yaml`, `templates/*`.
 
 ### Быстрый старт
 
 Рендер шаблонов:
 
 ```bash
-helm template donweather-front ./.helm
+helm template donweather-front ./.helm/donweather-front
 ```
 
 Установка:
 
 ```bash
-helm install donweather-front ./.helm -n donweather --create-namespace
+helm install donweather-front ./.helm/donweather-front -n donweather --create-namespace
 ```
 
 ### HTTPRoute (Gateway API)
@@ -58,7 +58,7 @@ httpRoute:
 
 ### ExternalSecret для `VITE_API_ENDPOINT` (ms-weather)
 
-Chart умеет создать `ExternalSecret`, который положит в Secret ключ `VITE_API_ENDPOINT`, а Deployment прочитает его в env.
+Chart умеет создать `ExternalSecret`, который положит в Secret ключ `api_endpoint`, а Deployment прочитает его в env `VITE_API_ENDPOINT`.
 
 Пример:
 
@@ -69,7 +69,7 @@ externalSecret:
     kind: ClusterSecretStore
     name: buildbyte
   data:
-    - secretKey: VITE_API_ENDPOINT
+    - secretKey: api_endpoint
       remoteRef:
         key: donweather/ms-weather
         property: url
