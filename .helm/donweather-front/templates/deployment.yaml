@@ -47,7 +47,7 @@ spec:
               value: {{ $v | quote }}
             {{- end }}
             {{- if .Values.externalSecret.enabled }}
-            - name: VITE_API_ENDPOINT
+            - name: API_ENDPOINT
               valueFrom:
                 secretKeyRef:
                   name: {{ include "donweather-front.externalSecretTargetName" . | quote }}

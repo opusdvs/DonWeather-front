@@ -14,7 +14,10 @@ import LoadingSpinner from './components/LoadingSpinner.vue'
 const API_ROUTES = {
   register: 'weather/register',
 }
-const API_ENDPOINT = import.meta.env.VITE_API_ENDPOINT
+const API_ENDPOINT = window.API_ENDPOINT
+if (!API_ENDPOINT) {
+  console.error('API_ENDPOINT is not defined')
+}
 const errorStatus = ref(false)
 const city = ref(localStorage.getItem('city') || 'Москва')
 const displayCityName = ref()
