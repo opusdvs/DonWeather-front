@@ -37,7 +37,7 @@ envFrom: []
 # ExternalSecret (external-secrets.io) для адреса ms-weather.
 # Создаёт Secret в namespace релиза, из которого Deployment берёт env VITE_API_ENDPOINT.
 externalSecret:
-  enabled: false
+  enabled: true
   refreshInterval: 1h
   secretStoreRef:
     # kind: SecretStore | ClusterSecretStore
@@ -56,7 +56,7 @@ externalSecret:
 
 # Gateway API HTTPRoute (вместо Ingress).
 httpRoute:
-  enabled: false
+  enabled: true
   annotations: {}
   # parentRefs определяют к какому Gateway/Listener прикрепить маршрут.
   # Пример:
