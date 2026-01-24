@@ -42,7 +42,7 @@ externalSecret:
   secretStoreRef:
     # kind: SecretStore | ClusterSecretStore
     kind: ClusterSecretStore
-    name: buildbyte
+    name: vault
   target:
     # name: "" => будет использовано имя по умолчанию (<release>-donweather-front-external)
     name: ""
