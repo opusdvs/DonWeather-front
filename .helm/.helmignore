@@ -1,0 +1,10 @@
+*.tgz
+.DS_Store
+.git/
+.idea/
+.vscode/
+node_modules/
+dist/
+coverage/
+*.log
+

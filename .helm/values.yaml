@@ -1,0 +1,90 @@
+replicaCount: 1
+
+image:
+  repository: buildbyte-container-registry.registry.twcstorage.ru/donweather-front
+  pullPolicy: IfNotPresent
+  tag: dev
+  digest: "sha256:a97ccbaec5a5889b899e04e8d32352b98b7feda68d3d4093e8c958f56cd763f7"
+
+imagePullSecrets:
+  - name: buildbyte-container-registry
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 80
+
+containerPort: 80
+
+resources: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# Параметризация стандартная, как в типовых чартах (может пригодиться в CI):
+# ВАЖНО: `VITE_API_ENDPOINT` здесь не задаём — он создаётся из `externalSecret` (ключ `api_endpoint`)
+env: {}
+envFrom: []
+
+# ExternalSecret (external-secrets.io) для адреса ms-weather.
+# Создаёт Secret в namespace релиза, из которого Deployment берёт env VITE_API_ENDPOINT.
+externalSecret:
+  enabled: false
+  refreshInterval: 1h
+  secretStoreRef:
+    # kind: SecretStore | ClusterSecretStore
+    kind: ClusterSecretStore
+    name: buildbyte
+  target:
+    # name: "" => будет использовано имя по умолчанию (<release>-donweather-front-external)
+    name: ""
+    creationPolicy: Owner
+  data:
+    # Внешний ключ/путь зависит от вашего SecretStore. Ниже — пример.
+    - secretKey: api_endpoint
+      remoteRef:
+        key: donweather/ms-weather
+        property: url
+
+# Gateway API HTTPRoute (вместо Ingress).
+httpRoute:
+  enabled: false
+  annotations: {}
+  # parentRefs определяют к какому Gateway/Listener прикрепить маршрут.
+  # Пример:
+  # parentRefs:
+  #   - name: my-gateway
+  #     namespace: default
+  #     sectionName: http
+  # По умолчанию цепляемся к dev-gateway (HTTPS listener).
+  parentRefs:
+    - name: dev-gateway
+      namespace: donweather
+      sectionName: https
+  hostnames:
+    - donweather.dev.buildbyte.ru
+  pathPrefix: /
+  # Если нужно — можно передать полный массив spec.rules (как в Gateway API).
+  rules: []
+
+  # Redirect HTTP(80) -> HTTPS(443). Важно: укажите parentRefs на HTTP listener (например sectionName: http),
+  # иначе при привязке к HTTPS listener получите redirect-loop.
+  redirectToHttps:
+    enabled: true
+    annotations: {}
+    # parentRefs для HTTP listener (обычно тот же Gateway, но sectionName=http)
+    parentRefs:
+      - name: dev-gateway
+        namespace: donweather
+        sectionName: http
+    statusCode: 301
+    scheme: https
+    port: 443

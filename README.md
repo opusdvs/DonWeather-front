@@ -156,6 +156,56 @@ VITE_API_ENDPOINT=https://your-api-endpoint.com
 VITE_API_ENDPOINT=http://localhost:8000
 ```
 
+### Kubernetes (Helm) + Vault (ExternalSecret): `VITE_API_ENDPOINT`
+
+Для деплоя в Kubernetes используется Helm chart в папке [`.helm/`](./.helm).
+
+#### 1) Создать секрет в Vault (KV)
+
+Chart по умолчанию ожидает секрет по пути **`secret/donweather/ms-weather`** с полем **`url`** (пример ниже — подставьте ваш адрес `ms-weather`):
+
+```bash
+kubectl exec -it vault-0 -n vault -- sh -c "
+export VAULT_ADDR='http://127.0.0.1:8200'
+export VAULT_TOKEN='$VAULT_TOKEN'
+vault kv put secret/donweather/ms-weather \
+  url='http://donweather-ms-weather-dev:8080'
+"
+```
+
+Проверка:
+
+```bash
+kubectl exec -it vault-0 -n vault -- sh -c "
+export VAULT_ADDR='http://127.0.0.1:8200'
+export VAULT_TOKEN='$VAULT_TOKEN'
+vault kv get secret/donweather/ms-weather
+"
+```
+
+#### 2) Включить ExternalSecret в Helm values
+
+Включите `externalSecret` (и при необходимости поправьте `secretStoreRef`/`remoteRef` под вашу конфигурацию):
+
+```yaml
+externalSecret:
+  enabled: true
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: buildbyte
+  data:
+    - secretKey: api_endpoint
+      remoteRef:
+        key: donweather/ms-weather
+        property: url
+```
+
+#### 3) Установить/обновить релиз
+
+```bash
+helm upgrade --install donweather-front ./.helm -n donweather --create-namespace
+```
+
 ## 🎨 Дизайн и стилистика
 
 Приложение использует минималистичную темную цветовую схему с градиентными акцентами.
