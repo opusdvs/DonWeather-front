@@ -14,7 +14,8 @@ import LoadingSpinner from './components/LoadingSpinner.vue'
 const API_ROUTES = {
   register: 'weather/register',
 }
-const API_ENDPOINT = window.API_ENDPOINT
+
+const API_ENDPOINT = window.__ENV__.API_ENDPOINT
 if (!API_ENDPOINT) {
   console.error('API_ENDPOINT is not defined')
 }
