@@ -77,7 +77,7 @@ httpRoute:
     # parentRefs для HTTP listener (обычно тот же Gateway, но sectionName=http)
     parentRefs:
       - name: dev-gateway
-        namespace: donweather
+        namespace: default
         sectionName: http
     statusCode: 301
     scheme: https
