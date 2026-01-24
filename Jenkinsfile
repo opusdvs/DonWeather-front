@@ -127,12 +127,16 @@ spec:
             }
         }
         
-        stage('Docker Build') {
+        stage('Build Docker Image') {
             steps {
                 container('docker-cli') {
-                    sh """
-                        docker build -t ${DOCKER_IMAGE} .
-                    """
+                    script {
+                        sh '''
+                            # Ждем запуска Docker daemon
+                            timeout 60 sh -c 'until docker info; do sleep 1; done'
+                            docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} .
+                        '''
+                    }
                 }
             }
         }
