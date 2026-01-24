@@ -18,7 +18,7 @@ const API_ROUTES = {
 
 // Нужно заменить на API_ENDPOINT из env.js
 // временное решение для dev
-const API_ENDPOINT = "http://donweather-ms-weather-dev:8080"
+const API_ENDPOINT = "https://api.donweather.dev.buildbyte.ru"
 const errorStatus = ref(false)
 const city = ref(localStorage.getItem('city') || 'Москва')
 const displayCityName = ref()
