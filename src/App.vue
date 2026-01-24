@@ -11,15 +11,12 @@ import DeveloperContacts from './components/DeveloperContacts.vue'
 import CopyrightFooter from './components/CopyrightFooter.vue'
 import ErrorDisplay from './components/ErrorDisplay.vue'
 import LoadingSpinner from './components/LoadingSpinner.vue'
-import { ENV } from '../public/env.js'
+import '../public/env.js'
 const API_ROUTES = {
   register: 'weather/register',
 }
 
-const API_ENDPOINT = ENV.API_ENDPOINT
-if (!API_ENDPOINT) {
-  console.error('API_ENDPOINT is not defined')
-}
+const API_ENDPOINT = window.__ENV__.API_ENDPOINT
 const errorStatus = ref(false)
 const city = ref(localStorage.getItem('city') || 'Москва')
 const displayCityName = ref()
