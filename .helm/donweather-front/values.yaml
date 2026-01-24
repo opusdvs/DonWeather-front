@@ -7,7 +7,7 @@ image:
   digest: "sha256:a97ccbaec5a5889b899e04e8d32352b98b7feda68d3d4093e8c958f56cd763f7"
 
 imagePullSecrets:
-  - name: buildbyte-container-registry
+  - name: docker-registry-credentials
 nameOverride: ""
 fullnameOverride: ""
 
