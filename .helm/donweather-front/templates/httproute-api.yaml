@@ -1,4 +1,4 @@
-{{- if and .Values.httpRoute.enabled .Values.httpRoute.api.enabled -}}
+{{- if and .Values.httpRoute.enabled (hasKey .Values.httpRoute "api") .Values.httpRoute.api.enabled -}}
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
