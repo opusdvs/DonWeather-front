@@ -67,10 +67,10 @@ externalSecret:
   enabled: true
   secretStoreRef:
     kind: ClusterSecretStore
-    name: buildbyte
+    name: vault
   secrets:
     - secretKey: api_endpoint
       remoteRef:
-        key: donweather/ms-weather
+        key: secret/donweather/ms-weather
         property: url
 ```

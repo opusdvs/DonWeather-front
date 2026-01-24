@@ -162,7 +162,9 @@ VITE_API_ENDPOINT=http://localhost:8000
 
 #### 1) Создать секрет в Vault (KV)
 
-Chart по умолчанию ожидает секрет по пути **`secret/donweather/ms-weather`** с полем **`url`** (пример ниже — подставьте ваш адрес `ms-weather`):
+Chart по умолчанию ожидает секрет в Vault KV v2 по пути **`secret/donweather/ms-weather`** с полем **`url`** (пример ниже — подставьте ваш адрес `ms-weather`).
+
+Важно: `/v1/...` в ошибках — это **версия Vault HTTP API**, а `version: v2` в `ClusterSecretStore` — это **KV engine v2** (отсюда `/data/` в URL). Это не конфликт.
 
 ```bash
 kubectl exec -it vault-0 -n vault -- sh -c "
@@ -192,11 +194,11 @@ externalSecret:
   enabled: true
   secretStoreRef:
     kind: ClusterSecretStore
-    name: buildbyte
+    name: vault
   secrets:
     - secretKey: api_endpoint
       remoteRef:
-        key: donweather/ms-weather
+        key: secret/donweather/ms-weather
         property: url
 ```
 

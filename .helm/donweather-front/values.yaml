@@ -47,7 +47,9 @@ externalSecret:
   secrets:
     - secretKey: api_endpoint
       remoteRef:
-        key: donweather/ms-weather
+        # Для Vault KV v2 key указывается в формате: <mount>/<path>
+        # Это даст запрос вида: /v1/<mount>/data/<path>
+        key: secret/donweather/ms-weather
         property: url
 
 # Gateway API HTTPRoute (вместо Ingress).
