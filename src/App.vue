@@ -11,12 +11,14 @@ import DeveloperContacts from './components/DeveloperContacts.vue'
 import CopyrightFooter from './components/CopyrightFooter.vue'
 import ErrorDisplay from './components/ErrorDisplay.vue'
 import LoadingSpinner from './components/LoadingSpinner.vue'
-import '../public/env.js'
+
 const API_ROUTES = {
   register: 'weather/register',
 }
 
-const API_ENDPOINT = window.__ENV__.API_ENDPOINT
+// Нужно заменить на API_ENDPOINT из env.js
+// временное решение для dev
+const API_ENDPOINT = "http://donweather-ms-weather-dev:8080"
 const errorStatus = ref(false)
 const city = ref(localStorage.getItem('city') || 'Москва')
 const displayCityName = ref()

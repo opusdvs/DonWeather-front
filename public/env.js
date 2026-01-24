@@ -1,2 +1,0 @@
-window.__ENV__ = window.__ENV__ || {}
-window.__ENV__.API_ENDPOINT = ""
