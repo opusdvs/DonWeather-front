@@ -193,7 +193,7 @@ externalSecret:
   secretStoreRef:
     kind: ClusterSecretStore
     name: buildbyte
-  data:
+  secrets:
     - secretKey: api_endpoint
       remoteRef:
         key: donweather/ms-weather

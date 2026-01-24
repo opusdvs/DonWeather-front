@@ -38,17 +38,13 @@ envFrom: []
 # Создаёт Secret в namespace релиза, из которого Deployment берёт env VITE_API_ENDPOINT.
 externalSecret:
   enabled: true
-  refreshInterval: 1h
+  refreshInterval: "1h"
   secretStoreRef:
-    # kind: SecretStore | ClusterSecretStore
-    kind: ClusterSecretStore
-    name: vault
+    name: "vault"
+    kind: "ClusterSecretStore"
   target:
-    # name: "" => будет использовано имя по умолчанию (<release>-donweather-front-external)
-    name: ""
-    creationPolicy: Owner
-  data:
-    # Внешний ключ/путь зависит от вашего SecretStore. Ниже — пример.
+    creationPolicy: "Owner"
+  secrets:
     - secretKey: api_endpoint
       remoteRef:
         key: donweather/ms-weather
