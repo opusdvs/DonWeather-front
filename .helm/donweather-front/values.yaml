@@ -65,7 +65,7 @@ httpRoute:
   # По умолчанию цепляемся к dev-gateway (HTTPS listener).
   parentRefs:
     - name: dev-gateway
-      namespace: donweather
+      namespace: default
       sectionName: https
   hostnames:
     - donweather.dev.buildbyte.ru
