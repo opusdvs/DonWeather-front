@@ -15,10 +15,3 @@
 Важно про API:
 - Фронт собирается Vite'ом, и `VITE_API_ENDPOINT` подставляется на этапе сборки образа.
 - Рекомендуемый вариант для k8s: собирать фронт с `VITE_API_ENDPOINT=""`, а маршрутизацию `/weather/*` делать через Gateway API (отдельным HTTPRoute на backend service).
-
-ExternalSecret:
-{{- if .Values.externalSecret.enabled }}
-- ExternalSecret включён и создаёт Secret {{ include "donweather-front.externalSecretTargetName" . }} (ключ `api_endpoint`, env `VITE_API_ENDPOINT`).
-{{- else }}
-- ExternalSecret выключен (externalSecret.enabled=false).
-{{- end }}

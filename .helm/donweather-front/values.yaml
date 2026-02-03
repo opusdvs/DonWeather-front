@@ -32,22 +32,6 @@ affinity: {}
 env: {}
 envFrom: []
 
-externalSecret:
-  enabled: true
-  refreshInterval: "1h"
-  secretStoreRef:
-    name: "vault"
-    kind: "ClusterSecretStore"
-  target:
-    creationPolicy: "Owner"
-  secrets:
-    - secretKey: api_endpoint
-      remoteRef:
-        # Для Vault KV v2 key указывается в формате: <mount>/<path>
-        # Это даст запрос вида: /v1/<mount>/data/<path>
-        key: secret/donweather/ms-weather
-        property: url
-
 # Gateway API HTTPRoute (вместо Ingress).
 httpRoute:
   enabled: true

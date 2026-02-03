@@ -39,19 +39,11 @@ spec:
             - name: http
               containerPort: {{ .Values.containerPort }}
               protocol: TCP
-          {{- $hasEnv := or (gt (len .Values.env) 0) .Values.externalSecret.enabled -}}
-          {{- if $hasEnv }}
+          {{- if gt (len .Values.env) 0 }}
           env:
             {{- range $k, $v := .Values.env }}
             - name: {{ $k | quote }}
               value: {{ $v | quote }}
-            {{- end }}
-            {{- if .Values.externalSecret.enabled }}
-            - name: API_ENDPOINT
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "donweather-front.externalSecretTargetName" . | quote }}
-                  key: api_endpoint
             {{- end }}
           {{- end }}
           {{- with .Values.envFrom }}
