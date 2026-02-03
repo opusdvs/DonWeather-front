@@ -5,22 +5,22 @@ pipeline {
 apiVersion: v1
 kind: Pod
 spec:
-nodeSelector:
+  nodeSelector:
     jenkins.io/agent: dedicated
-  affinity:
-    nodeAffinity:
-      requiredDuringSchedulingIgnoredDuringExecution:
-        nodeSelectorTerms:
-          - matchExpressions:
-              - key: jenkins.io/agent
-                operator: In
-                values:
-                  - dedicated
-  tolerations:
-    - key: jenkins.io/agent
-      operator: Equal
-      value: dedicated
-      effect: NoSchedule
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+            - matchExpressions:
+                - key: jenkins.io/agent
+                  operator: In
+                  values:
+                    - dedicated
+    tolerations:
+      - key: jenkins.io/agent
+        operator: Equal
+        value: dedicated
+        effect: NoSchedule
   containers:
   - name: node
     image: node:20-alpine
@@ -89,7 +89,7 @@ nodeSelector:
         }
     }
     
-   environment {
+    environment {
         IMAGE_NAME = 'donweather-front'
         IMAGE_TAG = "dev"
         DOCKER_HOST = 'unix:///var/run/docker.sock'
@@ -178,10 +178,10 @@ nodeSelector:
     }
     
     post {
-            success {
-                script {
-                    currentBuild.description = "Docker Image: ${env.DOCKER_IMAGE_HASH}"
-                }
+        success {
+            script {
+                currentBuild.description = "Docker Image: ${env.DOCKER_IMAGE_HASH}"
             }
+        }
     }
 }
