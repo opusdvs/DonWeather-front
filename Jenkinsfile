@@ -19,10 +19,10 @@ spec:
     resources:
       requests:
         memory: "512Mi"
-        cpu: "500m"
+        cpu: "250m"
       limits:
         memory: "2Gi"
-        cpu: "2000m"
+        cpu: "250m"
   
   - name: docker
     image: docker:dind
@@ -39,10 +39,10 @@ spec:
     resources:
       requests:
         memory: "512Mi"
-        cpu: "500m"
+        cpu: "250m"
       limits:
         memory: "2Gi"
-        cpu: "2000m"
+        cpu: "250m"
   
   - name: docker-cli
     image: docker:cli
@@ -60,7 +60,7 @@ spec:
         cpu: "250m"
       limits:
         memory: "1Gi"
-        cpu: "1000m"
+        cpu: "250m"
   
   volumes:
   - name: workspace-volume
