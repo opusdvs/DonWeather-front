@@ -7,20 +7,20 @@ kind: Pod
 spec:
   nodeSelector:
     jenkins.io/agent: dedicated
-    affinity:
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-                - key: jenkins.io/agent
-                  operator: In
-                  values:
-                    - dedicated
-    tolerations:
-      - key: jenkins.io/agent
-        operator: Equal
-        value: dedicated
-        effect: NoSchedule
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: jenkins.io/agent
+                operator: In
+                values:
+                  - dedicated
+  tolerations:
+    - key: jenkins.io/agent
+      operator: Equal
+      value: dedicated
+      effect: NoSchedule
   containers:
   - name: node
     image: node:20-alpine
