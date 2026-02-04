@@ -1,12 +1,13 @@
 <script setup>
 import { computed, ref, onMounted, watch } from 'vue'
 import axios from 'axios'
-import WeatherStats from './components/WeatherStats.vue'
+//import WeatherStats from './components/WeatherStats.vue'
 import CityName from './components/CityName.vue'
-import WeatherDisplay from './components/WeatherDisplay.vue'
+//simport WeatherDisplay from './components/WeatherDisplay.vue'
 import CityInput from './components/CityInput.vue'
 import WeatherTips from './components/WeatherTips.vue'
 import WeatherForecast from './components/WeatherForecast.vue'
+import WeatherDayDetail from './components/WeatherDayDetail.vue'
 import DeveloperContacts from './components/DeveloperContacts.vue'
 import CopyrightFooter from './components/CopyrightFooter.vue'
 import ErrorDisplay from './components/ErrorDisplay.vue'
@@ -18,7 +19,8 @@ const API_ROUTES = {
 
 // Нужно заменить на API_ENDPOINT из env.js
 // временное решение для dev
-const API_ENDPOINT = "https://api.donweather.dev.buildbyte.ru"
+//const API_ENDPOINT = "https://api.donweather.dev.buildbyte.ru"
+const API_ENDPOINT = "http://localhost:8080"
 const errorStatus = ref(false)
 const city = ref(localStorage.getItem('city') || 'Москва')
 const displayCityName = ref()
@@ -27,6 +29,8 @@ const errorCode = ref("")
 const errorMessage = ref("")
 const loading = ref(false)
 const loadingMessage = ref("Загрузка данных...")
+const formattedDate = ref(new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }))
+const selectedDate = ref(null)
 
 onMounted(() => {
   getWeather(city.value)
@@ -60,6 +64,9 @@ async function getWeather(value) {
     if (data.value?.location?.name) {
       localStorage.setItem('city', data.value.location.name)
       setDisplayCityName(data.value.location.name)
+    }
+    if (data.value?.forecast?.forecastday?.length) {
+      selectedDate.value = data.value.forecast.forecastday[0].date
     }
   } catch (err) {
     errorStatus.value = true
@@ -132,6 +139,19 @@ watch(errorStatus, (newVal) => {
     }, 5000)
   }
 })
+function avgPressure(date) {
+  return Math.floor(data.value.forecast.forecastday.find(item => item.date === date).hour.reduce((acc, item) => acc + item.pressure_mb, 0) / data.value.forecast.forecastday.find(item => item.date === date).hour.length)
+}
+function clickForecast(date, maxtemp_c, text) {
+  selectedDate.value = date
+  data.value.current.temp_c = maxtemp_c
+  data.value.current.condition.text = text
+  data.value.current.humidity = data.value.forecast.forecastday.find(item => item.date === date).day.avghumidity
+  data.value.current.wind_kph = data.value.forecast.forecastday.find(item => item.date === date).day.maxwind_kph
+  data.value.current.pressure_mb = avgPressure(date)
+  formattedDate.value = new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
+
+}
 </script>
 
 <template>
@@ -139,9 +159,10 @@ watch(errorStatus, (newVal) => {
     <div class="main-content">
       <ErrorDisplay :show="errorStatus" :code="errorCode" :message="errorMessage"  @closeError="closeError" />
       <CityName :name="displayCityName"></CityName>
-      <WeatherDisplay :temp="temp.temp" :desc="temp.desc"></WeatherDisplay>
-      <div class="stat-container">
-        <WeatherStats v-for="item in weather" v-bind="item" :key="item.label"></WeatherStats>
+      <!-- <WeatherDisplay :temp="temp.temp" :desc="temp.desc"></WeatherDisplay> -->
+      <div v-if="forecast.length" class="day-detail-section">
+        <WeatherDayDetail :weather="weather" :temp="temp" :formattedDate="formattedDate"></WeatherDayDetail>
+        <!-- <WeatherStats v-for="item in weather" v-bind="item" :key="item.label"></WeatherStats> -->
       </div>
       <div class="forecast-section">
         <h2 class="forecast-title">Прогноз погоды на 3 дня</h2>
@@ -152,6 +173,8 @@ watch(errorStatus, (newVal) => {
             :date="item?.date"
             :maxtemp_c="item?.day?.maxtemp_c"
             :text="item?.day?.condition?.text"
+            :selected="selectedDate === item?.date"
+            @clickForecast="clickForecast"
           />
           <div v-if="loading" class="loading-overlay">
             <LoadingSpinner size="medium" :message="loadingMessage" />
@@ -248,6 +271,13 @@ watch(errorStatus, (newVal) => {
   transform: translate(-50%, -50%);
   z-index: 10;
   pointer-events: none;
+}
+
+.day-detail-section {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 @media (max-width: 1024px) {

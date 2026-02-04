@@ -3,6 +3,7 @@ const { temp, desc } = defineProps({ temp: Number, desc: String })
 </script>
 <template>
   <div class="weather-card">
+    <div class="weather-card__label">Сегодня</div>
     <div class="temperature">{{ temp }}°C</div>
     <div class="description">{{ desc }}</div>
   </div>
@@ -23,6 +24,15 @@ const { temp, desc } = defineProps({ temp: Number, desc: String })
   transform: translateY(-4px);
   box-shadow: var(--shadow-lg);
   background: var(--color-bg-hover);
+}
+
+.weather-card__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: var(--spacing-xs);
 }
 
 .temperature {

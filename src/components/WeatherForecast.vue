@@ -1,10 +1,26 @@
 <script setup>
-  const { date, maxtemp_c, text } = defineProps({ date: String, maxtemp_c: Number, text: String })
+  const { date, maxtemp_c, text, selected } = defineProps({
+    date: String,
+    maxtemp_c: Number,
+    text: String,
+    selected: { type: Boolean, default: false },
+  })
   const formattedDate = new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
+  const emit = defineEmits(['clickForecast'])
+  function handleClick() {
+    emit('clickForecast', date, maxtemp_c, text)
+  }
 </script>
 <template>
   <div class="weather-forecast">
-    <div class="forecast-card">
+    <div
+      class="forecast-card"
+      :class="{ 'forecast-card--active': selected }"
+      role="button"
+      tabindex="0"
+      @click="handleClick"
+      @keydown.enter.space.prevent="handleClick"
+    >
       <div class="info">
         <div class="label">{{ formattedDate }}</div>
         <div class="value">{{ maxtemp_c }}°C</div>
@@ -37,6 +53,16 @@
 .forecast-card:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-md);
+  background: var(--color-bg-hover);
+}
+
+.forecast-card--active {
+  box-shadow: 0 0 0 2px var(--color-accent);
+  background: var(--color-bg-hover);
+}
+
+.forecast-card--active:hover {
+  box-shadow: 0 0 0 2px var(--color-accent), var(--shadow-md);
   background: var(--color-bg-hover);
 }
 
