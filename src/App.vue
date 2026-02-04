@@ -173,11 +173,13 @@ watch(errorStatus, (newVal) => {
   display: flex;
   flex-direction: row;
   min-height: 100vh;
+  width: 100%;
   padding: var(--spacing-lg);
   gap: var(--spacing-lg);
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   position: relative;
+  box-sizing: border-box;
 }
 
 .main-content {
@@ -187,6 +189,7 @@ watch(errorStatus, (newVal) => {
   align-items: center;
   flex: 0 1 auto;
   max-width: 1200px;
+  width: 100%;
   gap: var(--spacing-lg);
   margin: 0 auto;
 }
@@ -250,7 +253,8 @@ watch(errorStatus, (newVal) => {
 @media (max-width: 1024px) {
   .app {
     flex-direction: column;
-    justify-content: flex-start;
+    justify-content: center;
+    align-items: center;
   }
 
   .main-content {
