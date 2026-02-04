@@ -46,7 +46,7 @@ httpRoute:
   parentRefs:
     - name: dev-gateway
       namespace: default
-      sectionName: https
+      sectionName: https-donweather
   hostnames:
     - donweather.dev.buildbyte.ru
   pathPrefix: /
