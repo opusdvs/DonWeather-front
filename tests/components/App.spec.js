@@ -3,40 +3,44 @@ import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import axios from 'axios'
 import App from '@/App.vue'
+import ErrorDisplay from '@/components/ErrorDisplay.vue'
+import CityInput from '@/components/CityInput.vue'
 
-// Мокаем axios
 vi.mock('axios')
+
+const defaultStubs = {
+  CityName: true,
+  WeatherTips: true,
+  WeatherSubscribe: true,
+  WeatherForecast: true,
+  WeatherDayDetail: true,
+  DeveloperContacts: true,
+  CopyrightFooter: true,
+  LoadingSpinner: true,
+}
+
+const mockWeatherResponse = {
+  data: {
+    location: { name: 'Москва' },
+    current: { temp_c: 20, condition: { text: 'Ясно' }, humidity: 65, wind_kph: 10, pressure_mb: 1013 },
+    forecast: { forecastday: [] },
+  },
+}
 
 describe('App', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     localStorage.clear()
+    // Сохранённый город — при монтировании вызывается getWeather, а не геолокация
+    localStorage.setItem('city', 'Москва')
   })
 
   it('renders main components', () => {
-    // Мокаем axios для предотвращения ошибок при монтировании
-    axios.post.mockResolvedValue({
-      data: {
-        location: { name: 'Москва' },
-        current: { temp_c: 20, condition: { text: 'Ясно' } },
-        forecast: { forecastday: [] },
-      },
-    })
+    axios.post.mockResolvedValue(mockWeatherResponse)
 
     const wrapper = mount(App, {
       global: {
-        stubs: {
-          WeatherStats: true,
-          CityName: true,
-          WeatherDisplay: true,
-          CityInput: true,
-          WeatherTips: true,
-          WeatherForecast: true,
-          DeveloperContacts: true,
-          CopyrightFooter: true,
-          ErrorDisplay: true,
-          LoadingSpinner: true,
-        },
+        stubs: { ...defaultStubs, ErrorDisplay: true },
       },
     })
 
@@ -56,39 +60,21 @@ describe('App', () => {
         },
         forecast: {
           forecastday: [
-            {
-              date: '2024-01-15',
-              day: {
-                maxtemp_c: 22,
-                condition: { text: 'Солнечно' },
-              },
-            },
+            { date: '2024-01-15', day: { maxtemp_c: 22, condition: { text: 'Солнечно' } } },
           ],
         },
       },
     }
-
     axios.post.mockResolvedValue(mockData)
 
     mount(App, {
       global: {
-        stubs: {
-          WeatherStats: true,
-          CityName: true,
-          WeatherDisplay: true,
-          CityInput: true,
-          WeatherTips: true,
-          WeatherForecast: true,
-          DeveloperContacts: true,
-          CopyrightFooter: true,
-          ErrorDisplay: true,
-          LoadingSpinner: true,
-        },
+        stubs: { ...defaultStubs, ErrorDisplay: true },
       },
     })
 
     await nextTick()
-    await new Promise((resolve) => setTimeout(resolve, 100))
+    await new Promise((r) => setTimeout(r, 100))
 
     expect(axios.post).toHaveBeenCalled()
   })
@@ -98,65 +84,38 @@ describe('App', () => {
 
     const wrapper = mount(App, {
       global: {
-        stubs: {
-          WeatherStats: true,
-          CityName: true,
-          WeatherDisplay: true,
-          CityInput: true,
-          WeatherTips: true,
-          WeatherForecast: true,
-          DeveloperContacts: true,
-          CopyrightFooter: true,
-          ErrorDisplay: true,
-          LoadingSpinner: true,
-        },
+        stubs: { ...defaultStubs },
       },
     })
 
     await nextTick()
-    await new Promise((resolve) => setTimeout(resolve, 100))
+    await new Promise((r) => setTimeout(r, 150))
 
-    // Проверяем, что ошибка обработана
-    expect(wrapper.vm.errorStatus).toBe(true)
+    const errorDisplay = wrapper.findComponent(ErrorDisplay)
+    expect(errorDisplay.exists()).toBe(true)
+    expect(errorDisplay.props('show')).toBe(true)
   })
 
   it('validates empty city input', async () => {
-    // Мокаем axios для начального запроса при монтировании
-    axios.post.mockResolvedValue({
-      data: {
-        location: { name: 'Москва' },
-        current: { temp_c: 20, condition: { text: 'Ясно' } },
-        forecast: { forecastday: [] },
-      },
-    })
+    axios.post.mockResolvedValue(mockWeatherResponse)
 
     const wrapper = mount(App, {
       global: {
-        stubs: {
-          WeatherStats: true,
-          CityName: true,
-          WeatherDisplay: true,
-          CityInput: true,
-          WeatherTips: true,
-          WeatherForecast: true,
-          DeveloperContacts: true,
-          CopyrightFooter: true,
-          ErrorDisplay: true,
-          LoadingSpinner: true,
-        },
+        stubs: { ...defaultStubs },
       },
     })
 
-    // Ждем завершения начального запроса
     await nextTick()
-    await new Promise((resolve) => setTimeout(resolve, 100))
+    await new Promise((r) => setTimeout(r, 100))
 
-    // Теперь тестируем валидацию пустого города
-    await wrapper.vm.getWeather('')
+    const cityInput = wrapper.findComponent(CityInput)
+    await cityInput.find('input').setValue('')
+    await cityInput.find('button').trigger('click')
     await nextTick()
 
-    expect(wrapper.vm.errorStatus).toBe(true)
-    expect(wrapper.vm.errorMessage).toBe('Введите город')
-    expect(wrapper.vm.errorCode).toBe('Информация')
+    const errorDisplay = wrapper.findComponent(ErrorDisplay)
+    expect(errorDisplay.props('show')).toBe(true)
+    expect(errorDisplay.props('message')).toBe('Введите город')
+    expect(errorDisplay.props('code')).toBe('Информация')
   })
 })
