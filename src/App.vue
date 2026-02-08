@@ -6,6 +6,7 @@ import CityName from './components/CityName.vue'
 //simport WeatherDisplay from './components/WeatherDisplay.vue'
 import CityInput from './components/CityInput.vue'
 import WeatherTips from './components/WeatherTips.vue'
+import WeatherSubscribe from './components/WeatherSubscribe.vue'
 import WeatherForecast from './components/WeatherForecast.vue'
 import WeatherDayDetail from './components/WeatherDayDetail.vue'
 import DeveloperContacts from './components/DeveloperContacts.vue'
@@ -14,15 +15,19 @@ import ErrorDisplay from './components/ErrorDisplay.vue'
 import LoadingSpinner from './components/LoadingSpinner.vue'
 
 const API_ROUTES = {
-  register: 'weather/register',
+  register: '/api/v1/weather',
+  getCityByPosition: '/api/v1/georesolve',
 }
+
+const DEFAULT_CITY = "Москва"
 
 // Нужно заменить на API_ENDPOINT из env.js
 // временное решение для dev
-const API_ENDPOINT = "https://api.donweather.dev.buildbyte.ru"
-//const API_ENDPOINT = "http://localhost:8080"
+//const API_ENDPOINT = "https://api.donweather.dev.buildbyte.ru"
+const API_ENDPOINT = "http://localhost:8082"
 const errorStatus = ref(false)
-const city = ref(localStorage.getItem('city') || 'Москва')
+const position = ref(null)
+const city = ref(localStorage.getItem('city') || null)
 const displayCityName = ref()
 const data = ref()
 const errorCode = ref("")
@@ -31,11 +36,63 @@ const loading = ref(false)
 const loadingMessage = ref("Загрузка данных...")
 const formattedDate = ref(new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }))
 const selectedDate = ref(null)
+const cityByPosition = ref(null)
 
-onMounted(() => {
-  getWeather(city.value)
+
+onMounted(async () => {
+  if (city.value) {
+    getWeather(city.value)
+  } else {
+    try {
+      const cityByGeo = await getPosition()
+      if (cityByGeo) {
+        cityByPosition.value = cityByGeo
+        getWeather(cityByGeo)
+      }
+    } catch (error) {
+      console.log('Геолокация недоступна:', error)
+      getWeather(DEFAULT_CITY)
+    }
+  }
 })
 
+function getPosition() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Геолокация не поддерживается'))
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        position.value = pos
+        try {
+          const cityName = await getCityByPosition(pos)
+          resolve(cityName.name)
+        } catch (error) {
+          reject(error)
+        }
+      },
+      (error) => {
+        reject(error)
+      }
+    )
+  })
+}
+
+async function getCityByPosition(position) {
+  try {
+    const reqJson = {
+      latitude: parseFloat(position?.coords?.latitude),
+      longitude: parseFloat(position?.coords?.longitude),
+    }
+    const res = await axios.post(`${API_ENDPOINT}${API_ROUTES.getCityByPosition}`, reqJson)
+    return res.data
+  } catch (error) {
+    console.log('Ошибка получения города по координатам:', error)
+    throw error
+  }
+}
 function closeError(value) {
   errorStatus.value = value
 }
@@ -56,9 +113,10 @@ async function getWeather(value) {
     q: city.value,
     lang: 'ru',
     days: '3',
+
   }
   try {
-    const res = await axios.post(`${API_ENDPOINT}/${API_ROUTES.register}`, reqJson)
+    const res = await axios.post(`${API_ENDPOINT}${API_ROUTES.register}`, reqJson)
     errorStatus.value = false
     data.value = res.data
     if (data.value?.location?.name) {
@@ -156,147 +214,202 @@ function clickForecast(date, maxtemp_c, text) {
 
 <template>
   <div class="app">
+    <ErrorDisplay :show="errorStatus" :code="errorCode" :message="errorMessage" @closeError="closeError" />
+
     <div class="main-content">
-      <ErrorDisplay :show="errorStatus" :code="errorCode" :message="errorMessage"  @closeError="closeError" />
-      <CityName :name="displayCityName"></CityName>
-      <!-- <WeatherDisplay :temp="temp.temp" :desc="temp.desc"></WeatherDisplay> -->
-      <div v-if="forecast.length" class="day-detail-section">
-        <WeatherDayDetail :weather="weather" :temp="temp" :formattedDate="formattedDate"></WeatherDayDetail>
-        <!-- <WeatherStats v-for="item in weather" v-bind="item" :key="item.label"></WeatherStats> -->
-      </div>
-      <div class="forecast-section">
-        <h2 class="forecast-title">Прогноз погоды на 3 дня</h2>
-        <div class="forecast-container">
-          <WeatherForecast
-            v-for="item in forecast"
-            :key="item?.date"
-            :date="item?.date"
-            :maxtemp_c="item?.day?.maxtemp_c"
-            :text="item?.day?.condition?.text"
-            :selected="selectedDate === item?.date"
-            @clickForecast="clickForecast"
+      <CityName :name="displayCityName" />
+
+      <div class="content-card">
+        <aside class="content-left">
+          <WeatherSubscribe />
+        </aside>
+
+        <div class="content-center">
+          <WeatherDayDetail
+            v-if="forecast.length"
+            :weather="weather"
+            :temp="temp"
+            :formattedDate="formattedDate"
           />
-          <div v-if="loading" class="loading-overlay">
-            <LoadingSpinner size="medium" :message="loadingMessage" />
+
+          <div class="forecast-section">
+            <h2 class="forecast-title">Прогноз погоды на 3 дня</h2>
+            <div class="forecast-container">
+              <WeatherForecast
+                v-for="item in forecast"
+                :key="item?.date"
+                :date="item?.date"
+                :maxtemp_c="item?.day?.maxtemp_c"
+                :text="item?.day?.condition?.text"
+                :selected="selectedDate === item?.date"
+                @clickForecast="clickForecast"
+              />
+            </div>
+            <div v-if="loading" class="loading-overlay">
+              <LoadingSpinner size="medium" :message="loadingMessage" />
+            </div>
           </div>
+
+          <CityInput @inputCity="getWeather" />
         </div>
+
+        <aside class="content-right">
+          <WeatherTips />
+        </aside>
       </div>
-      <CityInput @inputCity="getWeather"></CityInput>
-      <WeatherTips></WeatherTips>
-      <CopyrightFooter></CopyrightFooter>
+
     </div>
-    <aside class="sidebar">
-      <DeveloperContacts></DeveloperContacts>
-    </aside>
+
+    <div class="dev-contacts-corner">
+      <DeveloperContacts />
+    </div>
+    <CopyrightFooter />
   </div>
 </template>
 
 <style scoped>
 .app {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  align-items: center;
   min-height: 100vh;
   width: 100%;
-  padding: var(--spacing-lg);
-  gap: var(--spacing-lg);
-  align-items: center;
-  justify-content: center;
-  position: relative;
+  padding: var(--spacing-xl);
   box-sizing: border-box;
 }
 
 .main-content {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  flex: 0 1 auto;
-  max-width: 1200px;
+  align-items: stretch;
+  max-width: 960px;
   width: 100%;
   gap: var(--spacing-lg);
-  margin: 0 auto;
+  padding-top: var(--spacing-xl);
 }
 
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  right: var(--spacing-lg);
-  top: var(--spacing-lg);
-  min-width: 280px;
-  z-index: 10;
-}
-
-.stat-container {
+/* --- общий контейнер для погоды + tips --- */
+.content-card {
   display: flex;
   flex-direction: row;
   gap: var(--spacing-lg);
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
+  background: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
 }
 
-.forecast-section {
+.content-left {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: var(--spacing-md);
-  width: 100%;
+  width: 200px;
+  flex-shrink: 0;
+  border-right: 1px solid rgba(144, 217, 224, 0.12);
+  padding-right: var(--spacing-lg);
+}
+
+.content-center {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  flex: 1;
+  min-width: 0;
+}
+
+.content-right {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  width: 200px;
+  flex-shrink: 0;
+  border-left: 1px solid rgba(144, 217, 224, 0.12);
+  padding-left: var(--spacing-lg);
+}
+
+/* --- forecast --- */
+.forecast-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
 }
 
 .forecast-title {
-  font-size: 24px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--color-primary);
   text-align: center;
   margin: 0;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.3px;
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 1px solid rgba(144, 217, 224, 0.12);
 }
 
 .forecast-container {
-  display: flex;
-  flex-direction: row;
-  gap: var(--spacing-lg);
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  position: relative;
-  min-height: 120px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-sm);
 }
 
 .loading-overlay {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   z-index: 10;
   pointer-events: none;
+  background: rgba(39, 46, 55, 0.6);
+  border-radius: var(--radius-sm);
 }
 
-.day-detail-section {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.dev-contacts-corner {
+  position: fixed;
+  bottom: var(--spacing-md);
+  right: var(--spacing-md);
+  z-index: 20;
 }
 
-@media (max-width: 1024px) {
+/* --- responsive --- */
+@media (max-width: 768px) {
   .app {
+    padding: var(--spacing-md);
+  }
+
+  .content-card {
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    padding: var(--spacing-lg);
   }
 
-  .main-content {
-    max-width: 100%;
+  .content-left {
     width: 100%;
+    border-right: none;
+    padding-right: 0;
+    border-bottom: 1px solid rgba(144, 217, 224, 0.12);
+    padding-bottom: var(--spacing-lg);
   }
 
-  .sidebar {
-    position: static;
+  .content-right {
     width: 100%;
-    min-width: auto;
-    align-items: center;
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid rgba(144, 217, 224, 0.12);
+    padding-top: var(--spacing-lg);
+  }
+}
+
+@media (max-width: 480px) {
+  .app {
+    padding: var(--spacing-sm);
+  }
+
+  .content-card {
+    padding: var(--spacing-md);
+  }
+
+  .forecast-container {
+    grid-template-columns: 1fr;
   }
 }
 </style>

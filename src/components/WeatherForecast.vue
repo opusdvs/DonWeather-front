@@ -31,59 +31,52 @@
 </template>
 <style scoped>
 .weather-forecast {
-  display: flex;
-  gap: var(--spacing-md);
-  justify-content: center;
-  flex-wrap: wrap;
+  width: 100%;
 }
 
 .forecast-card {
-  background: var(--color-bg-card);
-  border-radius: var(--radius-md);
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: var(--radius-sm);
   padding: var(--spacing-md);
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: 110px;
-  box-shadow: var(--shadow-sm);
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  width: 100%;
+  transition: background 0.2s ease, transform 0.2s ease;
   cursor: pointer;
 }
 
 .forecast-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-md);
-  background: var(--color-bg-hover);
+  background: rgba(0, 0, 0, 0.22);
+  transform: translateY(-2px);
 }
 
 .forecast-card--active {
-  box-shadow: 0 0 0 2px var(--color-accent);
-  background: var(--color-bg-hover);
+  background: rgba(144, 217, 224, 0.12);
+  box-shadow: inset 0 0 0 1.5px var(--color-accent);
 }
 
 .forecast-card--active:hover {
-  box-shadow: 0 0 0 2px var(--color-accent), var(--shadow-md);
-  background: var(--color-bg-hover);
+  background: rgba(144, 217, 224, 0.18);
 }
 
 .info {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: var(--spacing-xs);
 }
 
 .info .label {
   font-size: 13px;
   color: var(--color-primary-dark);
   font-weight: 400;
-  margin-bottom: var(--spacing-xs);
 }
 
 .info .value {
   font-size: 20px;
   font-weight: 600;
   color: var(--color-primary);
-  margin-bottom: var(--spacing-xs);
   transition: transform 0.3s ease;
 }
 
@@ -95,5 +88,6 @@
   font-size: 12px;
   color: var(--color-primary-dark);
   font-weight: 400;
+  text-align: center;
 }
 </style>

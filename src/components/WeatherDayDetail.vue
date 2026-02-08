@@ -23,34 +23,19 @@ const {weather, temp, formattedDate} = defineProps({ weather: Array, temp: Objec
 
 <style scoped>
 .day-detail {
-  max-width: 520px;
-  margin: 0 auto;
   width: 100%;
-}
-
-.day-detail__card {
-  background: var(--color-bg-card);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: var(--shadow-md);
-  transition: box-shadow 0.3s ease, background 0.3s ease;
-}
-
-.day-detail__card:hover {
-  box-shadow: var(--shadow-lg);
-  background: var(--color-bg-hover);
 }
 
 .day-detail__header {
   text-align: center;
   padding-bottom: var(--spacing-md);
   margin-bottom: var(--spacing-lg);
-  border-bottom: 1px solid rgba(144, 217, 224, 0.15);
+  border-bottom: 1px solid rgba(144, 217, 224, 0.12);
 }
 
 .day-detail__title {
   margin: 0;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--color-primary);
   text-transform: capitalize;
@@ -85,7 +70,7 @@ const {weather, temp, formattedDate} = defineProps({ weather: Array, temp: Objec
 
 .day-detail__grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--spacing-md);
 }
 

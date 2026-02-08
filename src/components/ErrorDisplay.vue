@@ -47,7 +47,7 @@ function closeError() {
   min-width: 240px;
   max-width: 100%;
   width: 100%;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .error-code {
@@ -78,7 +78,7 @@ function closeError() {
   font-size: 13px;
   font-family: var(--font);
   font-weight: 500;
-  transition: border-color 0.3s ease, background 0.3s ease, transform 0.2s ease;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
 }
 
 .error-btn:hover {

@@ -23,32 +23,32 @@ function cityValidation(value) {
 <style scoped>
 .city-input {
   display: flex;
-  justify-content: center;
   gap: var(--spacing-sm);
-  margin: var(--spacing-lg) 0;
+  width: 100%;
 }
 
 .city-input input {
   padding: var(--spacing-sm) var(--spacing-md);
   font-size: 16px;
   font-family: var(--font);
-  background: var(--color-bg-card);
-  border: 2px solid var(--color-bg-hover);
+  background: rgba(0, 0, 0, 0.15);
+  border: 1.5px solid transparent;
   border-radius: var(--radius-sm);
   outline: none;
-  width: 240px;
+  flex: 1;
+  min-width: 0;
   color: var(--color-primary);
-  transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+  transition: border-color 0.2s ease, background 0.2s ease;
 }
 
 .city-input input::placeholder {
   color: var(--color-primary-dark);
+  opacity: 0.6;
 }
 
 .city-input input:focus {
   border-color: var(--color-accent);
-  background: var(--color-bg-hover);
-  box-shadow: 0 0 0 3px rgba(144, 217, 224, 0.1);
+  background: rgba(0, 0, 0, 0.22);
 }
 
 .city-input button {
@@ -61,7 +61,7 @@ function cityValidation(value) {
   border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
   box-shadow: var(--shadow-sm);
 }
 

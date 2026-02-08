@@ -1,46 +1,46 @@
 <script setup>
-import { ref } from 'vue'
-const tipsText = ref('Можно гулять')
+const tips = [
+  'Одевайтесь по погоде — проверяйте температуру перед выходом',
+  'При высокой влажности возьмите зонт на всякий случай',
+  'Сильный ветер? Выбирайте защищённые маршруты',
+  'В солнечную погоду не забывайте про солнцезащитный крем',
+  'При низком давлении пейте больше воды и отдыхайте',
+]
 </script>
 <template>
   <div class="weather-tips">
-    <h3>Рекомендации на сегодня</h3>
-    <p>{{ tipsText }}</p>
+    <h3>Советы</h3>
+    <ul class="tips-list">
+      <li v-for="(tip, i) in tips" :key="i" class="tip-item">{{ tip }}</li>
+    </ul>
   </div>
 </template>
 <style scoped>
 .weather-tips {
-  background: var(--color-bg-card);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-lg);
-  width: 320px;
-  max-width: 100%;
-  text-align: center;
-  box-shadow: var(--shadow-md);
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease,
-    background 0.3s ease;
-}
-
-.weather-tips:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-  background: var(--color-bg-hover);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .weather-tips h3 {
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--color-primary);
   margin-bottom: var(--spacing-md);
 }
 
-.weather-tips p {
-  font-size: 15px;
-  color: var(--color-primary-dark);
-  line-height: 1.6;
+.tips-list {
+  list-style: none;
   margin: 0;
-  font-weight: 400;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.tip-item {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-primary-dark);
 }
 </style>
