@@ -1,9 +1,12 @@
 <script setup>
-import { computed, ref, onMounted, watch } from 'vue'
-import axios from 'axios'
-//import WeatherStats from './components/WeatherStats.vue'
+import { onMounted } from 'vue'
+import { DEFAULT_CITY } from '@/config/api'
+import { useError } from '@/composables/useError'
+import { useGeolocation } from '@/composables/useGeolocation'
+import { useWeather } from '@/composables/useWeather'
+import { useForecast } from '@/composables/useForecast'
+
 import CityName from './components/CityName.vue'
-//simport WeatherDisplay from './components/WeatherDisplay.vue'
 import CityInput from './components/CityInput.vue'
 import WeatherTips from './components/WeatherTips.vue'
 import WeatherSubscribe from './components/WeatherSubscribe.vue'
@@ -14,202 +17,34 @@ import CopyrightFooter from './components/CopyrightFooter.vue'
 import ErrorDisplay from './components/ErrorDisplay.vue'
 import LoadingSpinner from './components/LoadingSpinner.vue'
 
-const API_ROUTES = {
-  register: '/api/v1/weather',
-  getCityByPosition: '/api/v1/georesolve',
-}
-
-const DEFAULT_CITY = "Москва"
-
-// Нужно заменить на API_ENDPOINT из env.js
-// временное решение для dev
-//const API_ENDPOINT = "https://api.donweather.dev.buildbyte.ru"
-const API_ENDPOINT = "http://localhost:8082"
-const errorStatus = ref(false)
-const position = ref(null)
-const city = ref(localStorage.getItem('city') || null)
-const displayCityName = ref()
-const data = ref()
-const errorCode = ref("")
-const errorMessage = ref("")
-const loading = ref(false)
-const loadingMessage = ref("Загрузка данных...")
-const formattedDate = ref(new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' }))
-const selectedDate = ref(null)
-const cityByPosition = ref(null)
-
+const { errorStatus, errorCode, errorMessage, showError, closeError } = useError()
+const { getPosition } = useGeolocation()
+const { data, displayCityName, loading, loadingMessage, temp, weather, forecast, getWeather } =
+  useWeather({ showError })
+const { selectedDate, formattedDate, clickForecast, initSelectedDate } = useForecast(data)
 
 onMounted(async () => {
-  if (city.value) {
-    getWeather(city.value)
+  const savedCity = localStorage.getItem('city')
+
+  let result
+  if (savedCity) {
+    result = await getWeather(savedCity)
   } else {
     try {
       const cityByGeo = await getPosition()
       if (cityByGeo) {
-        cityByPosition.value = cityByGeo
-        getWeather(cityByGeo)
+        result = await getWeather(cityByGeo)
       }
     } catch (error) {
       console.log('Геолокация недоступна:', error)
-      getWeather(DEFAULT_CITY)
+      result = await getWeather(DEFAULT_CITY)
     }
+  }
+
+  if (result?.forecast?.forecastday) {
+    initSelectedDate(result.forecast.forecastday)
   }
 })
-
-function getPosition() {
-  return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) {
-      reject(new Error('Геолокация не поддерживается'))
-      return
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        position.value = pos
-        try {
-          const cityName = await getCityByPosition(pos)
-          resolve(cityName.name)
-        } catch (error) {
-          reject(error)
-        }
-      },
-      (error) => {
-        reject(error)
-      }
-    )
-  })
-}
-
-async function getCityByPosition(position) {
-  try {
-    const reqJson = {
-      latitude: parseFloat(position?.coords?.latitude),
-      longitude: parseFloat(position?.coords?.longitude),
-    }
-    const res = await axios.post(`${API_ENDPOINT}${API_ROUTES.getCityByPosition}`, reqJson)
-    return res.data
-  } catch (error) {
-    console.log('Ошибка получения города по координатам:', error)
-    throw error
-  }
-}
-function closeError(value) {
-  errorStatus.value = value
-}
-function setDisplayCityName(city = 'Москва') {
-  displayCityName.value = city
-}
-
-async function getWeather(value) {
-  city.value = value
-  if (city.value === "") {
-    errorStatus.value = true
-    errorCode.value = "Информация"
-    errorMessage.value = "Введите город"
-    return
-  }
-  loading.value = true
-  const reqJson = {
-    q: city.value,
-    lang: 'ru',
-    days: '3',
-
-  }
-  try {
-    const res = await axios.post(`${API_ENDPOINT}${API_ROUTES.register}`, reqJson)
-    errorStatus.value = false
-    data.value = res.data
-    if (data.value?.location?.name) {
-      localStorage.setItem('city', data.value.location.name)
-      setDisplayCityName(data.value.location.name)
-    }
-    if (data.value?.forecast?.forecastday?.length) {
-      selectedDate.value = data.value.forecast.forecastday[0].date
-    }
-  } catch (err) {
-    errorStatus.value = true
-
-    // Проверяем тип ошибки и обрабатываем соответственно
-    if (err.response?.status === 404) {
-      errorCode.value = "Не найдено"
-      errorMessage.value = "Город не найден. Проверьте название и попробуйте снова."
-    } else {
-      errorCode.value = "Ошибка"
-      errorMessage.value = "Неверное название города"
-    }
-
-  } finally {
-    loading.value = false
-  }
-}
-
-const temp = computed(() => {
-  if (!data.value?.current) {
-    return {}
-  }
-  return {
-    temp: data.value.current?.temp_c ?? null,
-    desc: data.value.current?.condition?.text ?? 'Нет данных',
-  }
-})
-const weather = computed(() => {
-  if (!data.value?.current) {
-    return []
-  }
-  return [
-    {
-      label: 'Влажность',
-      stat: data.value.current?.humidity ?? 0,
-    },
-    {
-      label: 'Ветер',
-      stat: data.value.current?.wind_kph ?? 0,
-    },
-    {
-      label: 'Давление',
-      stat: data.value.current?.pressure_mb ?? 0,
-    },
-  ]
-})
-
-const forecast = computed(() => {
-  if (!data.value?.forecast?.forecastday) {
-    return []
-  }
-  if (data.value.forecast.forecastday.length === 0) {
-    return []
-  }
-  return data.value.forecast.forecastday
-})
-
-let errorTimer = null
-
-watch(errorStatus, (newVal) => {
-  if (errorTimer) {
-    clearTimeout(errorTimer)
-    errorTimer = null
-  }
-
-  if (newVal) {
-    errorTimer = setTimeout(() => {
-      errorStatus.value = false
-      errorTimer = null
-    }, 5000)
-  }
-})
-function avgPressure(date) {
-  return Math.floor(data.value.forecast.forecastday.find(item => item.date === date).hour.reduce((acc, item) => acc + item.pressure_mb, 0) / data.value.forecast.forecastday.find(item => item.date === date).hour.length)
-}
-function clickForecast(date, maxtemp_c, text) {
-  selectedDate.value = date
-  data.value.current.temp_c = maxtemp_c
-  data.value.current.condition.text = text
-  data.value.current.humidity = data.value.forecast.forecastday.find(item => item.date === date).day.avghumidity
-  data.value.current.wind_kph = data.value.forecast.forecastday.find(item => item.date === date).day.maxwind_kph
-  data.value.current.pressure_mb = avgPressure(date)
-  formattedDate.value = new Date(date).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })
-
-}
 </script>
 
 <template>
