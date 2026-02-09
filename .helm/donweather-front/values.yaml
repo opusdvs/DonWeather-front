@@ -4,7 +4,7 @@ image:
   repository: buildbyte-container-registry.registry.twcstorage.ru/donweather-front
   pullPolicy: IfNotPresent
   tag: dev
-  digest: "sha256:469b4d7dd25114df4b6a638563a89d448c2d200e623e6bc5013be9a8e2b0cda9"
+  digest: "sha256:8ebe486b3190953f3586f79ca28a6d6741471ee359fbf8865637103f0c59b957"
 
 imagePullSecrets:
   - name: registry-docker-registry
