@@ -16,6 +16,7 @@ import DeveloperContacts from './components/DeveloperContacts.vue'
 import CopyrightFooter from './components/CopyrightFooter.vue'
 import ErrorDisplay from './components/ErrorDisplay.vue'
 import LoadingSpinner from './components/LoadingSpinner.vue'
+import ButtonGeo from './components/ButtonGeo.vue'
 
 const { errorStatus, errorCode, errorMessage, showError, closeError } = useError()
 const { getPosition } = useGeolocation()
@@ -45,6 +46,21 @@ onMounted(async () => {
     initSelectedDate(result.forecast.forecastday)
   }
 })
+
+async function handleClickGeo() {
+  try {
+    const cityByGeo = await getPosition()
+    if (cityByGeo) {
+      const result = await getWeather(cityByGeo)
+      if (result?.forecast?.forecastday) {
+        initSelectedDate(result.forecast.forecastday)
+      }
+    }
+  } catch (error) {
+    console.log('Ошибка определения города по геолокации:', error)
+  }
+}
+
 </script>
 
 <template>
@@ -83,6 +99,7 @@ onMounted(async () => {
             <div v-if="loading" class="loading-overlay">
               <LoadingSpinner size="medium" :message="loadingMessage" />
             </div>
+            <ButtonGeo @click="handleClickGeo" />
           </div>
 
           <CityInput @inputCity="getWeather" />

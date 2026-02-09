@@ -6,4 +6,4 @@ export const API_ROUTES = {
 export const DEFAULT_CITY = 'Москва'
 
 export const API_ENDPOINT = 'https://api.donweather.dev.buildbyte.ru'
-
+//export const API_ENDPOINT = 'http://185.196.117.162:8082'
