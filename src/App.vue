@@ -1,6 +1,6 @@
 <script setup>
-import { onMounted } from 'vue'
-import { DEFAULT_CITY } from '@/config/api'
+import { onMounted, onUnmounted } from 'vue'
+import { DEFAULT_CITY, WEATHER_UPDATE_INTERVAL_MS } from '@/config/api'
 import { useError } from '@/composables/useError'
 import { useGeolocation } from '@/composables/useGeolocation'
 import { useWeather } from '@/composables/useWeather'
@@ -19,10 +19,12 @@ import LoadingSpinner from './components/LoadingSpinner.vue'
 import ButtonGeo from './components/ButtonGeo.vue'
 
 const { errorStatus, errorCode, errorMessage, showError, closeError } = useError()
-const { getPosition } = useGeolocation()
+const { getPosition, setCurrentCity, getCurrentCity } = useGeolocation()
 const { data, displayCityName, loading, loadingMessage, temp, weather, forecast, getWeather } =
   useWeather({ showError })
 const { selectedDate, formattedDate, clickForecast, initSelectedDate } = useForecast(data)
+
+let intervalId = null
 
 onMounted(async () => {
   const savedCity = localStorage.getItem('city')
@@ -45,6 +47,24 @@ onMounted(async () => {
   if (result?.forecast?.forecastday) {
     initSelectedDate(result.forecast.forecastday)
   }
+
+  if (result?.location?.name) {
+    setCurrentCity(result.location.name)
+  }
+
+  // Создаем интервал для обновления погоды
+  intervalId = setInterval(() => {
+    const currentCity = getCurrentCity()
+    if (currentCity) {
+      getWeather(currentCity)
+    }
+  }, WEATHER_UPDATE_INTERVAL_MS)
+})
+
+onUnmounted(() => {
+  if (intervalId) {
+    clearInterval(intervalId)
+  }
 })
 
 async function handleClickGeo() {
@@ -55,12 +75,14 @@ async function handleClickGeo() {
       if (result?.forecast?.forecastday) {
         initSelectedDate(result.forecast.forecastday)
       }
+      if (result?.location?.name) {
+        setCurrentCity(result.location.name)
+      }
     }
   } catch (error) {
     console.log('Ошибка определения города по геолокации:', error)
   }
 }
-
 </script>
 
 <template>

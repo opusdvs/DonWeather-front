@@ -10,6 +10,7 @@ export function useWeather({ showError }) {
   const displayCityName = ref(null)
   const loading = ref(false)
   const loadingMessage = ref('Загрузка данных...')
+  let controller = null
 
   const temp = computed(() => {
     if (!data.value?.current) return {}
@@ -45,9 +46,23 @@ export function useWeather({ showError }) {
       return
     }
 
+    // Отменяем предыдущий запрос, если он существует
+    if (controller) {
+      controller.abort()
+    }
+
+    // Создаем новый контроллер для текущего запроса
+    controller = new AbortController()
+
     loading.value = true
     try {
-      const result = await fetchWeather(city.value)
+      const result = await fetchWeather(city.value, '3', controller.signal)
+
+      // Проверяем, не был ли запрос отменен
+      if (!result) {
+        return null
+      }
+
       data.value = result
       if (result?.location?.name) {
         localStorage.setItem('city', result.location.name)
@@ -55,6 +70,11 @@ export function useWeather({ showError }) {
       }
       return result
     } catch (err) {
+      // Игнорируем ошибку отмены запроса
+      if (err.name === 'CanceledError' || err.name === 'AbortError') {
+        return null
+      }
+
       if (err.response?.status === 404) {
         showError('Не найдено', 'Город не найден. Проверьте название и попробуйте снова.')
       } else {
