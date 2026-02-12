@@ -29,8 +29,8 @@
         <label class="subscribe__label">
           <input type="checkbox" class="subscribe__checkbox" />
           <span class="subscribe__param-info">
-            <span class="subscribe__param-name">Осадки</span>
-            <span class="subscribe__param-desc">Дождь, снег, град</span>
+            <span class="subscribe__param-name">Влажность</span>
+            <span class="subscribe__param-desc">Высокая влажность</span>
           </span>
         </label>
       </li>
@@ -49,15 +49,6 @@
           <span class="subscribe__param-info">
             <span class="subscribe__param-name">Давление</span>
             <span class="subscribe__param-desc">Скачки давления</span>
-          </span>
-        </label>
-      </li>
-      <li class="subscribe__param">
-        <label class="subscribe__label">
-          <input type="checkbox" class="subscribe__checkbox" />
-          <span class="subscribe__param-info">
-            <span class="subscribe__param-name">УФ-индекс</span>
-            <span class="subscribe__param-desc">Высокий уровень УФ</span>
           </span>
         </label>
       </li>
