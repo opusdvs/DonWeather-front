@@ -94,7 +94,7 @@ async function handleClickGeo() {
 
       <div class="content-card">
         <aside class="content-left">
-          <WeatherSubscribe />
+          <WeatherSubscribe :city="displayCityName" />
         </aside>
 
         <div class="content-center">

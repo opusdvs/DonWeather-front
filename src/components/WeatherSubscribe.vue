@@ -1,20 +1,20 @@
 <script setup>
+defineProps({
+  city: {
+    type: String,
+    default: null,
+  },
+})
 </script>
 
 <template>
   <div class="subscribe">
     <h3 class="subscribe__title">Подписка на погоду</h3>
-
-    <!-- Telegram -->
-    <label class="subscribe__channel-label">Telegram</label>
-    <input
-      type="text"
-      placeholder="@username"
-      class="subscribe__input"
-    />
+    <p v-if="city" class="subscribe__hint">
+      Подписка будет настроена для города: <strong>{{ city }}</strong>
+    </p>
 
     <!-- параметры погоды -->
-    <p class="subscribe__section-label">Уведомлять о:</p>
     <ul class="subscribe__params">
       <li class="subscribe__param">
         <label class="subscribe__label">
@@ -71,6 +71,18 @@
   font-weight: 600;
   color: var(--color-primary);
   margin: 0;
+}
+
+.subscribe__hint {
+  font-size: 12px;
+  color: var(--color-primary-dark);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.subscribe__hint strong {
+  color: var(--color-accent);
+  font-weight: 500;
 }
 
 /* --- channel label --- */
