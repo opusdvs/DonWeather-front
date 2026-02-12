@@ -1,10 +1,37 @@
 <script setup>
-defineProps({
+import { ref } from 'vue'
+const { city } = defineProps({
   city: {
     type: String,
     default: null,
   },
 })
+
+const params = [
+  {
+    name: 'Температура',
+    desc: 'Резкие перепады',
+  },
+  {
+    name: 'Влажность',
+    desc: 'Высокая влажность',
+  },
+  {
+    name: 'Ветер',
+    desc: 'Порывы от 15 м/с',
+  },
+  {
+    name: 'Давление',
+    desc: 'Скачки давления',
+  },
+]
+
+const selectedParams = ref([])
+const emit = defineEmits(['selectedParams'])
+
+function handleSelectedParams() {
+  emit('selectedParams', {params: selectedParams.value, city: city})
+}
 </script>
 
 <template>
@@ -16,45 +43,18 @@ defineProps({
 
     <!-- параметры погоды -->
     <ul class="subscribe__params">
-      <li class="subscribe__param">
+      <li v-for="param in params" :key="param.name" class="subscribe__param">
         <label class="subscribe__label">
-          <input type="checkbox" class="subscribe__checkbox" checked />
+          <input type="checkbox" class="subscribe__checkbox" v-model="selectedParams" :value="param.name"/>
           <span class="subscribe__param-info">
-            <span class="subscribe__param-name">Температура</span>
-            <span class="subscribe__param-desc">Резкие перепады</span>
-          </span>
-        </label>
-      </li>
-      <li class="subscribe__param">
-        <label class="subscribe__label">
-          <input type="checkbox" class="subscribe__checkbox" />
-          <span class="subscribe__param-info">
-            <span class="subscribe__param-name">Влажность</span>
-            <span class="subscribe__param-desc">Высокая влажность</span>
-          </span>
-        </label>
-      </li>
-      <li class="subscribe__param">
-        <label class="subscribe__label">
-          <input type="checkbox" class="subscribe__checkbox" />
-          <span class="subscribe__param-info">
-            <span class="subscribe__param-name">Ветер</span>
-            <span class="subscribe__param-desc">Порывы от 15 м/с</span>
-          </span>
-        </label>
-      </li>
-      <li class="subscribe__param">
-        <label class="subscribe__label">
-          <input type="checkbox" class="subscribe__checkbox" />
-          <span class="subscribe__param-info">
-            <span class="subscribe__param-name">Давление</span>
-            <span class="subscribe__param-desc">Скачки давления</span>
+            <span class="subscribe__param-name">{{ param.name }}</span>
+            <span class="subscribe__param-desc">{{ param.desc }}</span>
           </span>
         </label>
       </li>
     </ul>
 
-    <button type="button" class="subscribe__btn">Подписаться</button>
+    <button type="button" class="subscribe__btn" @click="handleSelectedParams">Подписаться</button>
   </div>
 </template>
 

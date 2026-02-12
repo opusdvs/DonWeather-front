@@ -5,6 +5,7 @@ import { useError } from '@/composables/useError'
 import { useGeolocation } from '@/composables/useGeolocation'
 import { useWeather } from '@/composables/useWeather'
 import { useForecast } from '@/composables/useForecast'
+import { useSubscribe } from '@/composables/useSubscribe'
 
 import CityName from './components/CityName.vue'
 import CityInput from './components/CityInput.vue'
@@ -23,7 +24,7 @@ const { getPosition, setCurrentCity, getCurrentCity } = useGeolocation()
 const { data, displayCityName, loading, loadingMessage, temp, weather, forecast, getWeather } =
   useWeather({ showError })
 const { selectedDate, formattedDate, clickForecast, initSelectedDate } = useForecast(data)
-
+const { handleSelectedParams } = useSubscribe()
 let intervalId = null
 
 onMounted(async () => {
@@ -83,6 +84,16 @@ async function handleClickGeo() {
     console.log('Ошибка определения города по геолокации:', error)
   }
 }
+
+async function handleWeatherSubscribe(params) {
+  try {
+    const res = await handleSelectedParams(params)
+    console.log(res)
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 </script>
 
 <template>
@@ -94,7 +105,7 @@ async function handleClickGeo() {
 
       <div class="content-card">
         <aside class="content-left">
-          <WeatherSubscribe :city="displayCityName" />
+          <WeatherSubscribe :city="displayCityName" @selectedParams="handleWeatherSubscribe" />
         </aside>
 
         <div class="content-center">
