@@ -24,7 +24,7 @@ const { getPosition, setCurrentCity, getCurrentCity } = useGeolocation()
 const { data, displayCityName, loading, loadingMessage, temp, weather, forecast, getWeather } =
   useWeather({ showError })
 const { selectedDate, formattedDate, clickForecast, initSelectedDate } = useForecast(data)
-const { handleSelectedParams } = useSubscribe()
+const { token, handleSelectedParams } = useSubscribe()
 let intervalId = null
 
 onMounted(async () => {
@@ -86,9 +86,20 @@ async function handleClickGeo() {
 }
 
 async function handleWeatherSubscribe(params) {
+  const selected = params?.params
+  if (!selected?.length) {
+    showError('Ошибка', 'Выберите хотя бы один параметр для подписки')
+    return
+  }
   try {
     const res = await handleSelectedParams(params)
     console.log(res)
+    // После успешной подписки открываем Telegram с токеном
+    const subscribeToken = res?.token || token.value
+    if (subscribeToken) {
+      const telegramUrl = `https://t.me/don_weather_bot?start=${subscribeToken}`
+      window.open(telegramUrl, '_blank')
+    }
   } catch (error) {
     console.error(error)
   }

@@ -12,7 +12,11 @@ export async function fetchSubscribe(params) {
   console.log(requestJson)
   try {
     const res = await axios.post(`${API_ENDPOINT}${API_ROUTES.createSubscribe}`, requestJson)
-    return res.data
+    // Возвращаем токен из запроса, если его нет в ответе
+    return {
+      ...res.data,
+      token: res.data?.token || requestJson.token
+    }
   } catch (error) {
     console.error(error)
     throw error
