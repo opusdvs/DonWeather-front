@@ -10,7 +10,7 @@ export function useForecast(data) {
   )
 
   function avgPressure(date) {
-    const days = data.value?.forecast?.forecastday
+    const days = data.value?.weather?.forecast?.forecastday
     if (!days?.length) return 0
     const day = days.find((item) => item.date === date)
     if (!day?.hour?.length) return 0
@@ -19,19 +19,19 @@ export function useForecast(data) {
   }
 
   function clickForecast(date, maxtemp_c, text) {
-    const days = data.value?.forecast?.forecastday
-    const current = data.value?.current
+    const days = data.value?.weather?.forecast?.forecastday
+    const current = data.value?.weather?.current
     if (!days?.length || !current) return
 
     const dayData = days.find((item) => item.date === date)
     if (!dayData) return
 
     selectedDate.value = date
-    current.temp_c = maxtemp_c
-    current.condition.text = text
-    current.humidity = dayData.day.avghumidity
-    current.wind_kph = dayData.day.maxwind_kph
-    current.pressure_mb = avgPressure(date)
+    data.value.weather.current.temp_c = maxtemp_c
+    data.value.weather.current.condition.text = text
+    data.value.weather.current.humidity = dayData.day.avghumidity
+    data.value.weather.current.wind_kph = dayData.day.maxwind_kph
+    data.value.weather.current.pressure_mb = avgPressure(date)
     formattedDate.value = new Date(date).toLocaleDateString('ru-RU', {
       day: 'numeric',
       month: 'long',

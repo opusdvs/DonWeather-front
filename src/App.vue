@@ -6,6 +6,7 @@ import { useGeolocation } from '@/composables/useGeolocation'
 import { useWeather } from '@/composables/useWeather'
 import { useForecast } from '@/composables/useForecast'
 import { useSubscribe } from '@/composables/useSubscribe'
+import { useTips } from '@/composables/useTips'
 
 import CityName from './components/CityName.vue'
 import CityInput from './components/CityInput.vue'
@@ -18,6 +19,7 @@ import CopyrightFooter from './components/CopyrightFooter.vue'
 import ErrorDisplay from './components/ErrorDisplay.vue'
 import LoadingSpinner from './components/LoadingSpinner.vue'
 import ButtonGeo from './components/ButtonGeo.vue'
+import WeatherUpdate from './components/WeatherUpdate.vue'
 
 const { errorStatus, errorCode, errorMessage, showError, closeError } = useError()
 const { getPosition, setCurrentCity, getCurrentCity } = useGeolocation()
@@ -25,6 +27,7 @@ const { data, displayCityName, loading, loadingMessage, temp, weather, forecast,
   useWeather({ showError })
 const { selectedDate, formattedDate, clickForecast, initSelectedDate } = useForecast(data)
 const { token, handleSelectedParams } = useSubscribe()
+const { tips, setTips } = useTips(data)
 let intervalId = null
 
 onMounted(async () => {
@@ -45,14 +48,14 @@ onMounted(async () => {
     }
   }
 
-  if (result?.forecast?.forecastday) {
-    initSelectedDate(result.forecast.forecastday)
+  if (result?.weather?.forecast?.forecastday) {
+    initSelectedDate(result.weather.forecast.forecastday)
   }
 
-  if (result?.location?.name) {
-    setCurrentCity(result.location.name)
+  if (result?.weather?.location?.name) {
+    setCurrentCity(result.weather.location.name)
   }
-
+  setTips(result)
   // Создаем интервал для обновления погоды
   intervalId = setInterval(() => {
     const currentCity = getCurrentCity()
@@ -73,11 +76,11 @@ async function handleClickGeo() {
     const cityByGeo = await getPosition()
     if (cityByGeo) {
       const result = await getWeather(cityByGeo)
-      if (result?.forecast?.forecastday) {
-        initSelectedDate(result.forecast.forecastday)
+      if (result?.weather?.forecast?.forecastday) {
+        initSelectedDate(result.weather.forecast.forecastday)
       }
-      if (result?.location?.name) {
-        setCurrentCity(result.location.name)
+      if (result?.weather?.location?.name) {
+        setCurrentCity(result.weather.location.name)
       }
     }
   } catch (error) {
@@ -93,6 +96,7 @@ async function handleWeatherSubscribe(params) {
   }
   try {
     const res = await handleSelectedParams(params)
+    tips.value = res?.tips
     console.log(res)
     // После успешной подписки открываем Telegram с токеном
     const subscribeToken = res?.token || token.value
@@ -102,6 +106,25 @@ async function handleWeatherSubscribe(params) {
     }
   } catch (error) {
     console.error(error)
+  }
+}
+
+async function handleUpdateWeather() {
+  const currentCity = getCurrentCity()
+  if (!currentCity) {
+    showError('Ошибка', 'Город не выбран')
+    return
+  }
+  try {
+    const result = await getWeather(currentCity)
+    if (result?.weather?.forecast?.forecastday) {
+      initSelectedDate(result.weather.forecast.forecastday)
+    }
+    if (result?.weather?.location?.name) {
+      setCurrentCity(result.weather.location.name)
+    }
+  } catch (error) {
+    console.error('Ошибка обновления погоды:', error)
   }
 }
 
@@ -146,11 +169,14 @@ async function handleWeatherSubscribe(params) {
             <ButtonGeo @click="handleClickGeo" />
           </div>
 
-          <CityInput @inputCity="getWeather" />
+          <div class="city-input-wrapper">
+            <WeatherUpdate @updateWeather="handleUpdateWeather" />
+            <CityInput @inputCity="getWeather" />
+          </div>
         </div>
 
         <aside class="content-right">
-          <WeatherTips />
+          <WeatherTips :tips="tips" />
         </aside>
       </div>
 
@@ -182,6 +208,13 @@ async function handleWeatherSubscribe(params) {
   width: 100%;
   gap: var(--spacing-lg);
   padding-top: var(--spacing-xl);
+}
+
+.city-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
 }
 
 /* --- общий контейнер для погоды + tips --- */

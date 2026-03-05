@@ -1,17 +1,13 @@
 <script setup>
-const tips = [
-  'Одевайтесь по погоде — проверяйте температуру перед выходом',
-  'При высокой влажности возьмите зонт на всякий случай',
-  'Сильный ветер? Выбирайте защищённые маршруты',
-  'В солнечную погоду не забывайте про солнцезащитный крем',
-  'При низком давлении пейте больше воды и отдыхайте',
-]
+const { tips } = defineProps({ tips: Array })
 </script>
 <template>
   <div class="weather-tips">
     <h3>Советы</h3>
-    <ul class="tips-list">
-      <li v-for="(tip, i) in tips" :key="i" class="tip-item">{{ tip }}</li>
+    <ul v-if="tips?.length" class="tips-list">
+      <li v-for="(tip, i) in tips" :key="i" class="tip-item">
+        {{ tip.text }}
+      </li>
     </ul>
   </div>
 </template>
@@ -36,6 +32,7 @@ const tips = [
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+  flex: 1;
 }
 
 .tip-item {

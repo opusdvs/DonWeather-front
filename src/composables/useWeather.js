@@ -13,25 +13,25 @@ export function useWeather({ showError }) {
   let controller = null
 
   const temp = computed(() => {
-    if (!data.value?.current) return {}
+    if (!data.value?.weather?.current) return {}
     return {
-      temp: data.value.current?.temp_c ?? null,
-      desc: data.value.current?.condition?.text ?? 'Нет данных',
+      temp: data.value.weather.current?.temp_c ?? null,
+      desc: data.value.weather.current?.condition?.text ?? 'Нет данных',
     }
   })
 
   const weather = computed(() => {
-    if (!data.value?.current) return []
+    if (!data.value?.weather?.current) return []
     return [
-      { label: 'Влажность', stat: data.value.current?.humidity ?? 0 },
-      { label: 'Ветер', stat: data.value.current?.wind_kph ?? 0 },
-      { label: 'Давление', stat: data.value.current?.pressure_mb ?? 0 },
+      { label: 'Влажность', stat: data.value.weather.current?.humidity ?? 0 },
+      { label: 'Ветер', stat: data.value.weather.current?.wind_kph ?? 0 },
+      { label: 'Давление', stat: data.value.weather.current?.pressure_mb ?? 0 },
     ]
   })
 
   const forecast = computed(() => {
-    if (!data.value?.forecast?.forecastday) return []
-    return data.value.forecast.forecastday
+    if (!data.value?.weather?.forecast?.forecastday) return []
+    return data.value.weather.forecast.forecastday
   })
 
   function setDisplayCityName(name = 'Москва') {
@@ -64,9 +64,9 @@ export function useWeather({ showError }) {
       }
 
       data.value = result
-      if (result?.location?.name) {
-        localStorage.setItem('city', result.location.name)
-        setDisplayCityName(result.location.name)
+      if (result?.weather?.location?.name) {
+        localStorage.setItem('city', result.weather.location.name)
+        setDisplayCityName(result.weather.location.name)
       }
       return result
     } catch (err) {

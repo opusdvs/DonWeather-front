@@ -63,6 +63,8 @@ function cityValidation(value) {
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
   box-shadow: var(--shadow-sm);
+  min-width: 120px;
+  white-space: nowrap;
 }
 
 .city-input button:hover {
